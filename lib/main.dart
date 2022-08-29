@@ -1,11 +1,21 @@
+import 'dart:io';
+
+import 'package:desktop_window/desktop_window.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:maple_daily_tracker/components/timing.dart';
+import 'package:maple_daily_tracker/components/tracker_section.dart';
 
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
+    DesktopWindow.setMinWindowSize(const Size(800, 600));
+  }
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -15,14 +25,13 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      theme: ThemeData.dark().copyWith(
       ),
+      themeMode: ThemeMode.dark,
       home: const MyHomePage(title: 'Maple Daily Tracker'),
       debugShowCheckedModeBanner: false,
     );
@@ -45,10 +54,40 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: SizedBox.expand(
+                      child: TrackerSection(),
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: double.infinity,
+                          width: 250,
+                          child: Timing(),
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          height: double.infinity,
+                          width: 250,
+                          color: Colors.green
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
