@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 class SectionHeader extends StatelessWidget {
   const SectionHeader({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class SectionHeader extends StatelessWidget {
         Row(
           children: [
             ActionChip(
-              avatar: Icon(Icons.remove_red_eye_rounded),
+              avatar: stateToIcon(false),
               label: Text("Dailies"),
               onPressed: () {},
             ),
@@ -20,6 +21,7 @@ class SectionHeader extends StatelessWidget {
               width: 4.0,
             ),
             ActionChip(
+              avatar: stateToIcon(false),
               label: Text("Weeklies"),
               onPressed: () {},
             ),
@@ -27,6 +29,7 @@ class SectionHeader extends StatelessWidget {
               width: 4.0,
             ),
             ActionChip(
+              avatar: stateToIcon(false),
               label: Text("Mon Weeklies"),
               onPressed: () {},
             ),
@@ -34,5 +37,10 @@ class SectionHeader extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Icon stateToIcon (bool isHidden) {
+    IconData data = isHidden ? CupertinoIcons.eye_slash_fill : CupertinoIcons.eye_fill;
+    return Icon(data);
   }
 }

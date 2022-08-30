@@ -14,7 +14,7 @@ class _TrackerSectionState extends State<TrackerSection> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-        children: [
+        children: const [
           SectionHeader(),
           Section(title: "Dailies"),
           Section(title: "Weekly Bosses"),

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maple_daily_tracker/components/timer_text.dart';
+import 'package:maple_daily_tracker/extensions/duration_extensions.dart';
+import 'package:maple_daily_tracker/helpers/reset_helper.dart';
 
 class Timing extends StatefulWidget {
   const Timing({Key? key}) : super(key: key);
@@ -52,12 +54,20 @@ class _TimingState extends State<Timing> {
                         timerDisplay:
                             DateFormat('EEE MMMM d hh:mm:ss a').format(utcNow)),
                     TimerText(
-                        label: "Daily Reset", timerDisplay: "timer value"),
+                      label: "Daily Reset",
+                      timerDisplay:
+                          ResetHelper().calcResetTime().toDisplayFormat(),
+                    ),
                     TimerText(
-                        label: "Weekly Reset", timerDisplay: "timer value"),
+                        label: "Weekly Reset",
+                      timerDisplay:
+                      ResetHelper().calcWeeklyResetTime().toDisplayFormat(),
+                    ),
                     TimerText(
                         label: "Monday Weekly Reset",
-                        timerDisplay: "timer value"),
+                      timerDisplay:
+                      ResetHelper().calcWeeklyResetTime(resetDay: DateTime.monday).toDisplayFormat(),
+                    )
                   ],
                 ),
               ),
