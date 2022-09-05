@@ -19,7 +19,7 @@ class DefaultFirebaseOptions {
     if (kIsWeb) {
       throw UnsupportedError(
         'DefaultFirebaseOptions have not been configured for web - '
-            'you can reconfigure this by running the FlutterFire CLI again.',
+        'you can reconfigure this by running the FlutterFire CLI again.',
       );
     }
     switch (defaultTargetPlatform) {
@@ -30,15 +30,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-              'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-              'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return linux;
       default:
         throw UnsupportedError(
           'DefaultFirebaseOptions are not supported for this platform.',
@@ -51,6 +45,7 @@ class DefaultFirebaseOptions {
     appId: '1:394212424281:android:657bc1d4cbdf2365418f48',
     messagingSenderId: '394212424281',
     projectId: 'mapletracker-85796',
+    databaseURL: 'https://mapletracker-85796-default-rtdb.firebaseio.com',
     storageBucket: 'mapletracker-85796.appspot.com',
   );
 
@@ -59,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:394212424281:ios:8cd8c887642dd1cd418f48',
     messagingSenderId: '394212424281',
     projectId: 'mapletracker-85796',
+    databaseURL: 'https://mapletracker-85796-default-rtdb.firebaseio.com',
     storageBucket: 'mapletracker-85796.appspot.com',
     iosClientId: '394212424281-tgchkskdqff4r611ecfnp28628m6gt4m.apps.googleusercontent.com',
     iosBundleId: 'com.brycecallender.mapleDailyTracker',
@@ -69,8 +65,31 @@ class DefaultFirebaseOptions {
     appId: '1:394212424281:ios:8cd8c887642dd1cd418f48',
     messagingSenderId: '394212424281',
     projectId: 'mapletracker-85796',
+    databaseURL: 'https://mapletracker-85796-default-rtdb.firebaseio.com',
     storageBucket: 'mapletracker-85796.appspot.com',
     iosClientId: '394212424281-tgchkskdqff4r611ecfnp28628m6gt4m.apps.googleusercontent.com',
     iosBundleId: 'com.brycecallender.mapleDailyTracker',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyBWlR-y0r9gLnX-oYzr9zM9bzRyu0ISfhk',
+    appId: '1:394212424281:web:a2ec196b7f00f4ba418f48',
+    messagingSenderId: '394212424281',
+    projectId: 'mapletracker-85796',
+    authDomain: 'mapletracker-85796.firebaseapp.com',
+    databaseURL: 'https://mapletracker-85796-default-rtdb.firebaseio.com',
+    storageBucket: 'mapletracker-85796.appspot.com',
+    measurementId: 'G-SPGX11ZM78',
+  );
+
+  static const FirebaseOptions linux = FirebaseOptions(
+    apiKey: 'AIzaSyBWlR-y0r9gLnX-oYzr9zM9bzRyu0ISfhk',
+    appId: '1:394212424281:web:182bf379b09c1ffb418f48',
+    messagingSenderId: '394212424281',
+    projectId: 'mapletracker-85796',
+    authDomain: 'mapletracker-85796.firebaseapp.com',
+    databaseURL: 'https://mapletracker-85796-default-rtdb.firebaseio.com',
+    storageBucket: 'mapletracker-85796.appspot.com',
+    measurementId: 'G-GSGG2FF13E',
   );
 }

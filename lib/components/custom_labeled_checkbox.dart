@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maple_daily_tracker/extensions/color_extensions.dart';
 
 enum CheckboxType {
   Parent,
@@ -51,6 +52,7 @@ class CustomLabeledCheckbox extends StatelessWidget {
                       _onChanged();
                     },
                     activeColor: activeColor ?? themeData.toggleableActiveColor,
+                    checkColor: (activeColor ?? themeData.toggleableActiveColor).toLuminanceColor()
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -67,10 +69,10 @@ class CustomLabeledCheckbox extends StatelessWidget {
   }
 
   void _onChanged() {
-    // if (value != null) {
-    //   onChanged(!value);
-    // } else {
-    //   onChanged(value);
-    // }
+    if (value != null) {
+      //onChanged(!value);
+    } else {
+      //onChanged(value);
+    }
   }
 }

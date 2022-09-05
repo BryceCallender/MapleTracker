@@ -1,46 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:maple_daily_tracker/extensions/color_extensions.dart';
+import 'package:maple_daily_tracker/extensions/enum_extensions.dart';
+import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:provider/provider.dart';
 
 class SectionHeader extends StatelessWidget {
   const SectionHeader({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text("Starcraft"),
-        Row(
-          children: [
-            ActionChip(
-              avatar: stateToIcon(false),
-              label: Text("Dailies"),
-              onPressed: () {},
-            ),
-            const SizedBox(
-              width: 4.0,
-            ),
-            ActionChip(
-              avatar: stateToIcon(false),
-              label: Text("Weeklies"),
-              onPressed: () {},
-            ),
-            const SizedBox(
-              width: 4.0,
-            ),
-            ActionChip(
-              avatar: stateToIcon(false),
-              label: Text("Mon Weeklies"),
-              onPressed: () {},
-            ),
-          ],
-        ),
-      ],
+    var colorScheme = Theme.of(context).colorScheme;
+    var activeColor = colorScheme.secondary;
+    var backgroundColor = colorScheme.background;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Consumer<TrackerModel>(
+            builder: (context, tracker, child) {
+              return Row(
+                children: [
+                  for (var section in tracker.character.sections.values) ...[
+                    ActionChip(
+                      avatar: stateToIcon(section.isActive, activeColor),
+                      label: Text(
+                        section.actionType.toProperName(),
+                        style: TextStyle(
+                            color: (section.isActive
+                                    ? activeColor
+                                    : backgroundColor)
+                                .toLuminanceColor(),
+                        ),
+                      ),
+                      backgroundColor: section.isActive ? activeColor : null,
+                      onPressed: () {
+                        tracker.toggleSection(section.actionType, !section.isActive);
+                      },
+                    ),
+                    SizedBox(
+                      width: 4.0,
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
-  Icon stateToIcon (bool isHidden) {
-    IconData data = isHidden ? CupertinoIcons.eye_slash_fill : CupertinoIcons.eye_fill;
-    return Icon(data);
+  Icon stateToIcon(bool isActive, Color activeColor) {
+    IconData data =
+        isActive ? CupertinoIcons.eye_fill : CupertinoIcons.eye_slash_fill;
+    return Icon(
+      data,
+      color: isActive ? activeColor.toLuminanceColor() : Colors.white,
+    );
   }
 }

@@ -3,7 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  desktop_window
+  desktop_webview_auth
+  window_size
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
