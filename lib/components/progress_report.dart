@@ -18,7 +18,7 @@ class ProgressReport extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (var character in tracker.characters) ...[
-                    CharacterProgress(),
+                    CharacterProgress(character: character,),
                     SizedBox(height: 12.0,)
                   ]
                 ],

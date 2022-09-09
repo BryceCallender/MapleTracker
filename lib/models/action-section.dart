@@ -19,4 +19,10 @@ class ActionSection {
 
     return actions.length > 0 ? done / actions.length : 0;
   }
+
+  void reset() {
+    for(var action in actions) {
+      action.done = false;
+    }
+  }
 }

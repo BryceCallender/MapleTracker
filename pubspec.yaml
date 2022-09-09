@@ -46,7 +46,8 @@ dependencies:
   shared_preferences: ^2.0.15
   intl: ^0.17.0
   flutterfire_ui: ^0.4.3+7
-  simple_animations: ^5.0.0+2
+  flutter_animate: ^1.0.0
+  sticky_headers: ^0.3.0+2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.10.0

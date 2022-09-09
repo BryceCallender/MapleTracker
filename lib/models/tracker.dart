@@ -17,10 +17,13 @@ class TrackerModel extends ChangeNotifier {
         Character(
           name: "Starcraft",
           sections: {
-            ActionType.daily: ActionSection(
+            ActionType.dailies: ActionSection(
               isActive: true,
-              actionType: ActionType.daily,
-              actions: [Maple.Action(name: 'VJ', order: 0, done: false)],
+              actionType: ActionType.dailies,
+              actions: [
+                Maple.Action(name: 'VJ', order: 0, done: false),
+                Maple.Action(name: 'ChuChu', order: 1, done: true)
+              ],
             ),
             ActionType.weeklyBoss: ActionSection(
               isActive: true,
@@ -37,9 +40,9 @@ class TrackerModel extends ChangeNotifier {
         Character(
           name: "Zephyr",
           sections: {
-            ActionType.daily: ActionSection(
+            ActionType.dailies: ActionSection(
               isActive: false,
-              actionType: ActionType.daily,
+              actionType: ActionType.dailies,
               actions: [],
             ),
             ActionType.weeklyBoss: ActionSection(
@@ -91,6 +94,17 @@ class TrackerModel extends ChangeNotifier {
   }
 
   void resetAllProgress() {
+    for(var type in ActionType.values) {
+      resetProgress(type);
+    }
+  }
+
+  void resetProgress(ActionType type) {
+    for(var character in characters) {
+      var actions = character.sections[type];
+      actions?.reset();
+    }
+
     notifyListeners();
   }
 }

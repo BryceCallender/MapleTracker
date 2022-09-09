@@ -1,9 +1,9 @@
 class Action {
-  final String name;
-  final int order;
-  final bool done;
-  final bool? isTemp;
-  final DateTime? removalTime;
+  String name;
+  int order;
+  bool done;
+  bool? isTemp;
+  DateTime? removalTime;
 
   Action({required this.name, required this.order, required this.done, this.isTemp, this.removalTime});
 }

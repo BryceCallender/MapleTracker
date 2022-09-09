@@ -22,7 +22,7 @@ class CustomLabeledCheckbox extends StatelessWidget {
 
   final String label;
   final bool? value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool?> onChanged;
   final CheckboxType? checkboxType;
   final Color? activeColor;
   final bool tristate;
@@ -37,31 +37,20 @@ class CustomLabeledCheckbox extends StatelessWidget {
         padding: const EdgeInsets.only(left: 10, right: 16),
         child: Row(
           children: <Widget>[
-            Expanded(
-              child: ExpansionTile(
-                title: Text(label),
-                controlAffinity: ListTileControlAffinity.leading,
-                children: [
-                  checkboxType == CheckboxType.Child
-                      ? const SizedBox(width: 32)
-                      : const SizedBox(width: 0),
-                  Checkbox(
-                    tristate: tristate,
-                    value: value,
-                    onChanged: (val) {
-                      _onChanged();
-                    },
-                    activeColor: activeColor ?? themeData.toggleableActiveColor,
-                    checkColor: (activeColor ?? themeData.toggleableActiveColor).toLuminanceColor()
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: themeData.textTheme.subtitle1,
-                  )
-                ],
-              ),
-            ),
+            Checkbox(
+                tristate: tristate,
+                value: value,
+                onChanged: (val) {
+                  _onChanged();
+                },
+                activeColor: activeColor ?? themeData.toggleableActiveColor,
+                checkColor: (activeColor ?? themeData.toggleableActiveColor)
+                    .toLuminanceColor()),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: themeData.textTheme.subtitle1,
+            )
           ],
         ),
       ),
@@ -70,9 +59,7 @@ class CustomLabeledCheckbox extends StatelessWidget {
 
   void _onChanged() {
     if (value != null) {
-      //onChanged(!value);
-    } else {
-      //onChanged(value);
+      onChanged(value);
     }
   }
 }

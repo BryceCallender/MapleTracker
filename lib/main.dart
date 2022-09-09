@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         dividerColor: Colors.transparent,
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.purple
+          backgroundColor: Colors.blue
         ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(

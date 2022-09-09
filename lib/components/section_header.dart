@@ -14,8 +14,9 @@ class SectionHeader extends StatelessWidget {
     var activeColor = colorScheme.secondary;
     var backgroundColor = colorScheme.background;
 
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(8.0),
+      color: colorScheme.background,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -29,15 +30,15 @@ class SectionHeader extends StatelessWidget {
                       label: Text(
                         section.actionType.toProperName(),
                         style: TextStyle(
-                            color: (section.isActive
-                                    ? activeColor
-                                    : backgroundColor)
-                                .toLuminanceColor(),
+                          color:
+                              (section.isActive ? activeColor : backgroundColor)
+                                  .toLuminanceColor(),
                         ),
                       ),
                       backgroundColor: section.isActive ? activeColor : null,
                       onPressed: () {
-                        tracker.toggleSection(section.actionType, !section.isActive);
+                        tracker.toggleSection(
+                            section.actionType, !section.isActive);
                       },
                     ),
                     SizedBox(

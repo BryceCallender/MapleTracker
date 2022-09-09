@@ -1,5 +1,5 @@
 enum ActionType {
-  daily,
+  dailies,
   weeklyBoss,
   weeklyQuest
 }

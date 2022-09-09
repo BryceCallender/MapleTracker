@@ -7,14 +7,18 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 import '../models/action-type.dart';
+import '../models/character.dart';
 
 class CharacterProgress extends StatelessWidget {
-  const CharacterProgress({Key? key}) : super(key: key);
+  const CharacterProgress({Key? key, required this.character})
+      : super(key: key);
 
   final double progressHeight = 20.0;
+  final Character character;
 
   @override
   Widget build(BuildContext context) {
+    final sections = character.sections;
     final color = Theme.of(context).colorScheme.secondary;
 
     return GestureDetector(
@@ -23,42 +27,41 @@ class CharacterProgress extends StatelessWidget {
       child: Stack(
         fit: StackFit.loose,
         children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(character.name),
+              SizedBox(
+                height: 8.0,
+              ),
+              trackerProgress(
+                sections[ActionType.dailies]!,
+                color,
+              ),
+              SizedBox(
+                height: 6.0,
+              ),
+              trackerProgress(
+                sections[ActionType.weeklyBoss]!,
+                color,
+              ),
+              SizedBox(
+                height: 6.0,
+              ),
+              trackerProgress(
+                sections[ActionType.weeklyQuest]!,
+                color,
+              ),
+            ],
+          ),
           Consumer<TrackerModel>(
             builder: (context, tracker, child) {
-              var sections = tracker.character.sections;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(tracker.character.name),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                  trackerProgress(
-                    sections[ActionType.daily]!,
-                    color,
-                  ),
-                  SizedBox(
-                    height: 6.0,
-                  ),
-                  trackerProgress(
-                    sections[ActionType.weeklyBoss]!,
-                    color,
-                  ),
-                  SizedBox(
-                    height: 6.0,
-                  ),
-                  trackerProgress(
-                    sections[ActionType.weeklyQuest]!,
-                    color,
-                  ),
-                ],
+              return Visibility(
+                visible: tracker.completion,
+                child: Positioned.fill(child: Stamp()),
               );
             },
-          ),
-          Visibility(
-            visible: Provider.of<TrackerModel>(context).completion,
-            child: Positioned.fill(child: Stamp()),
-          ),
+          )
         ],
       ),
     );
@@ -71,7 +74,8 @@ class CharacterProgress extends StatelessWidget {
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 500),
       child: isVisible
-          ? createProgressIndicator(section.actionType.toProperName(), completePercentage, color)
+          ? createProgressIndicator(
+              section.actionType.toProperName(), completePercentage, color)
           : SizedBox(),
     );
   }
