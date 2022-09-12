@@ -69,7 +69,9 @@ class TrackerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get completion => _character.hasCompletedActions();
+  bool hasCompletedActions(Character character) {
+    return character.hasCompletedActions();
+  }
 
   /// An unmodifiable view of the items in the cart.
   UnmodifiableListView<Character> get characters =>
@@ -85,26 +87,32 @@ class TrackerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleSection(ActionType type, bool isActive) {
-    var currentSection = character.sections[type];
-    if (currentSection != null) {
-      currentSection.isActive = isActive;
-      notifyListeners();
-    }
+  void toggleSection(ActionType type) {
+    var currentSection = character.sections[type]!;
+    currentSection.isActive = !currentSection.isActive;
+    notifyListeners();
   }
 
-  void resetAllProgress() {
-    for(var type in ActionType.values) {
-      resetProgress(type);
-    }
+  void addAction(ActionType type, Maple.Action action) {
+    var currentSection = character.sections[type]!;
+    var actions = currentSection.actions;
+
+    action.order = actions.length;
+    actions.add(action);
+    notifyListeners();
   }
 
-  void resetProgress(ActionType type) {
-    for(var character in characters) {
-      var actions = character.sections[type];
-      actions?.reset();
-    }
+  void updateAction(ActionType type, Maple.Action action) {
+    var currentSection = character.sections[type]!;
+    var actions = currentSection.actions;
+    var oldAction = actions.firstWhere((a) => a.name == action.name);
+    var replaceIndex = actions.indexOf(oldAction);
+    actions[replaceIndex] = oldAction.copy(done: action.done);
 
     notifyListeners();
+  }
+
+  bool isNameAvailable(String name) {
+    return _characters.where((c) => c.name == name).isEmpty;
   }
 }

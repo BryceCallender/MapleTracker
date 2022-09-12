@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:maple_daily_tracker/components/stamp.dart';
 import 'package:maple_daily_tracker/extensions/enum_extensions.dart';
 import 'package:maple_daily_tracker/models/action-section.dart';
@@ -52,12 +53,13 @@ class CharacterProgress extends StatelessWidget {
                 sections[ActionType.weeklyQuest]!,
                 color,
               ),
-            ],
+            ].animate()
+              .fadeIn(),
           ),
           Consumer<TrackerModel>(
             builder: (context, tracker, child) {
               return Visibility(
-                visible: tracker.completion,
+                visible: tracker.hasCompletedActions(character),
                 child: Positioned.fill(child: Stamp()),
               );
             },
@@ -84,6 +86,7 @@ class CharacterProgress extends StatelessWidget {
     return LinearPercentIndicator(
       animation: true,
       animationDuration: 500,
+      animateFromLastPercent: true,
       lineHeight: progressHeight,
       padding: EdgeInsets.zero,
       center: Text(

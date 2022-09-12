@@ -16,13 +16,19 @@ class Character {
 
   bool hasCompletedActions() {
     int completedSections = 0;
+    int visibleSections = 0;
 
     for(var section in sections.values) {
+      if (!section.isActive) {
+        continue;
+      }
+
+      visibleSections++;
       if (section.percentage() == 1.0) {
         completedSections++;
       }
     }
 
-    return completedSections == sections.length;
+    return visibleSections > 0 && completedSections == visibleSections;
   }
 }

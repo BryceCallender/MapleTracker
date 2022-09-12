@@ -1,6 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/checkbox_section.dart';
-import 'package:maple_daily_tracker/components/custom_labeled_checkbox.dart';
 import 'package:maple_daily_tracker/models/action-section.dart';
 import 'package:maple_daily_tracker/models/action-type.dart';
 import 'package:maple_daily_tracker/models/tracker.dart';
@@ -19,43 +19,54 @@ class Section extends StatelessWidget {
     return Consumer<TrackerModel>(
       builder: (context, tracker, child) {
         var section = tracker.character.sections[type];
-        return AnimatedSwitcher(
-          duration: Duration(milliseconds: 500),
-          child:
-              section!.isActive ? trackerCard(textTheme, section) : SizedBox(),
-        );
+        return trackerCard(textTheme, tracker, section!);
       },
     );
   }
 
-  Widget trackerCard(TextTheme textTheme, ActionSection section) {
-    return Visibility(
-      visible: section.isActive,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: textTheme.bodyText1,
-              ),
-              Row(
+  Widget trackerCard(TextTheme textTheme, TrackerModel tracker, ActionSection section) {
+    return Card(
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                IconButton(
+                    onPressed: () {
+                      tracker.toggleSection(section.actionType);
+                    },
+                    icon: section.isActive
+                        ? Icon(CupertinoIcons.eye_fill)
+                        : Icon(CupertinoIcons.eye_slash_fill),
+                ),
+                Text(
+                  title,
+                  style: textTheme.bodyText1,
+                ),
+              ],
+            ),
+            Visibility(
+              visible: section.isActive,
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CheckboxSection(
                     label: "Unfinished",
+                    type: type,
+                    canAdd: true,
                     items: section.actions.where((a) => !a.done).toList(),
                   ),
                   CheckboxSection(
                     label: "Finished",
+                    type: type,
                     items: section.actions.where((a) => a.done).toList(),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

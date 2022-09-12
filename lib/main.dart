@@ -19,7 +19,7 @@ void main() async {
 
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
     setWindowTitle('Maple Tracker');
-    setWindowMinSize(const Size(800, 600));
+    setWindowMinSize(const Size(1000, 600));
   }
 
   await Firebase.initializeApp(
@@ -31,8 +31,9 @@ void main() async {
       create: (_) => TrackerModel(),
     ),
     StreamProvider<User?>(
-        create: (_) => FirebaseAuth.instance.authStateChanges(),
-        initialData: null)
+      create: (_) => FirebaseAuth.instance.authStateChanges(),
+      initialData: null,
+    )
   ];
 
   runApp(
@@ -49,13 +50,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Maple Tracker',
       theme: ThemeData.dark().copyWith(
         useMaterial3: true,
         dividerColor: Colors.transparent,
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.blue
-        ),
+        appBarTheme: AppBarTheme(backgroundColor: Colors.blue),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
@@ -107,9 +106,30 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: _showWelcome ? WelcomeScreen() : LoginScreen());
+      appBar: AppBar(
+        title: Text(widget.title),
+        automaticallyImplyLeading: false,
+        actions: [
+          PopupMenuButton(
+            position: PopupMenuPosition.under,
+            icon: CircleAvatar(
+              backgroundColor: Colors.tealAccent,
+              child: const Text("BC"),
+            ),
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  child: Text('Logout'),
+                  onTap: () {
+
+                  },
+                )
+              ];
+            },
+          )
+        ],
+      ),
+      body: _showWelcome ? WelcomeScreen() : LoginScreen(),
+    );
   }
 }

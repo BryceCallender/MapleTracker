@@ -33,33 +33,29 @@ class CustomLabeledCheckbox extends StatelessWidget {
 
     return InkWell(
       onTap: _onChanged,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 16),
-        child: Row(
-          children: <Widget>[
-            Checkbox(
-                tristate: tristate,
-                value: value,
-                onChanged: (val) {
-                  _onChanged();
-                },
-                activeColor: activeColor ?? themeData.toggleableActiveColor,
-                checkColor: (activeColor ?? themeData.toggleableActiveColor)
-                    .toLuminanceColor()),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: themeData.textTheme.subtitle1,
-            )
-          ],
-        ),
+      child: Row(
+        children: <Widget>[
+          Checkbox(
+            tristate: tristate,
+            value: value,
+            onChanged: (val) => _onChanged(),
+            activeColor: activeColor ?? themeData.toggleableActiveColor,
+            checkColor: (activeColor ?? themeData.toggleableActiveColor)
+                .toLuminanceColor(),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: themeData.textTheme.subtitle1,
+          )
+        ],
       ),
     );
   }
 
   void _onChanged() {
     if (value != null) {
-      onChanged(value);
+      onChanged(!value!);
     }
   }
 }

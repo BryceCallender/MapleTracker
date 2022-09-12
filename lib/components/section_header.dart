@@ -37,8 +37,7 @@ class SectionHeader extends StatelessWidget {
                       ),
                       backgroundColor: section.isActive ? activeColor : null,
                       onPressed: () {
-                        tracker.toggleSection(
-                            section.actionType, !section.isActive);
+                        tracker.toggleSection(section.actionType);
                       },
                     ),
                     SizedBox(
