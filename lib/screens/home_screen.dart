@@ -26,14 +26,14 @@ class HomeScreen extends StatelessWidget {
                     Expanded(
                       child: Container(
                         height: double.infinity,
-                        width: 250,
+                        width: 275,
                         child: Timing(),
                       ),
                     ),
                     Expanded(
                       child: Container(
                         height: double.infinity,
-                        width: 250,
+                        width: 275,
                         child: ProgressReport(),
                       ),
                     )

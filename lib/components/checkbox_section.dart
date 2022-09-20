@@ -26,8 +26,8 @@ class CheckboxSection extends StatelessWidget {
   Widget build(BuildContext context) {
     var accent = Theme.of(context).colorScheme.secondary;
     return Container(
-      margin: EdgeInsets.all(8.0),
-      padding: EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         border: Border.all(color: accent),
         borderRadius: BorderRadius.circular(5.0),
@@ -35,18 +35,22 @@ class CheckboxSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                label,
-                textAlign: TextAlign.left,
-              ),
-              IconButton(
-                onPressed: () => _dialogBuilder(context),
-                icon: Icon(Icons.add),
-              )
-            ],
+          SizedBox(
+            height: 30.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  textAlign: TextAlign.left,
+                ),
+                if (canAdd ?? false)
+                  IconButton(
+                    onPressed: () => _dialogBuilder(context),
+                    icon: Icon(Icons.add),
+                  )
+              ],
+            ),
           ),
           SizedBox(
             height: 8.0,
