@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/character_progress.dart';
-import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
 class ProgressReport extends StatelessWidget {

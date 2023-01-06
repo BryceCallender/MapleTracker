@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:maple_daily_tracker/models/action-section.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
+
+import '../models/action-type.dart';
+import '../models/character.dart';
 
 class AddCharacterDialog extends StatefulWidget {
   const AddCharacterDialog({Key? key}) : super(key: key);
@@ -80,6 +84,16 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
         TextButton(
           onPressed: () {
             var tracker = Provider.of<TrackerModel>(context, listen: false);
+            tracker.add(
+              Character(
+                name: _nameController.text.trim(),
+                sections: {
+                  ActionType.dailies: ActionSection.empty(ActionType.dailies),
+                  ActionType.weeklyBoss: ActionSection.empty(ActionType.weeklyBoss),
+                  ActionType.weeklyQuest: ActionSection.empty(ActionType.weeklyQuest)
+                }
+              ),
+            );
             Navigator.of(context).pop();
           },
           child: const Text('Add'),

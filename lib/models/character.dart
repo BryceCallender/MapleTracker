@@ -1,3 +1,5 @@
+import 'package:enum_to_string/enum_to_string.dart';
+
 import 'action-section.dart';
 import 'action-type.dart';
 
@@ -30,5 +32,42 @@ class Character {
     }
 
     return visibleSections > 0 && completedSections == visibleSections;
+  }
+
+  void resetSection(ActionType action) {
+    sections[action]!.reset();
+  }
+
+  Character.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        order = json['order'],
+        sections = toActionSections(json['sections']);
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'order': order,
+    'sections': convertSections()
+  };
+
+  Map<String, dynamic> convertSections () {
+    Map<String, dynamic> map = {};
+
+    sections.forEach((key, value) {
+      map[key.name] = value.toJson();
+    });
+
+    return map;
+  }
+
+  static Map<ActionType, ActionSection> toActionSections (dynamic sections) {
+    final mapTest = Map<String, dynamic>.from(sections);
+    final mappedSections = Map<ActionType, ActionSection>();
+
+    for (var section in mapTest.entries) {
+      var actionType = EnumToString.fromString(ActionType.values, section.key);
+      mappedSections[actionType!] = ActionSection.fromJson(Map<String, dynamic>.from(section.value));
+    }
+
+    return mappedSections;
   }
 }

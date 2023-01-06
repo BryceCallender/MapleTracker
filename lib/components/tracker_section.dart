@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/confirmation_dialog.dart';
 import 'package:maple_daily_tracker/components/section.dart';
-import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
 import '../models/action-type.dart';
@@ -25,6 +25,8 @@ class _TrackerSectionState extends State<TrackerSection>
   @override
   Widget build(BuildContext context) {
     return Consumer<TrackerModel>(builder: (context, tracker, child) {
+      var themeData = Theme.of(context);
+
       return DefaultTabController(
         initialIndex: 0,
         length: tracker.characters.length,
@@ -32,10 +34,11 @@ class _TrackerSectionState extends State<TrackerSection>
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             flexibleSpace: TabBar(
+              indicatorColor: themeData.colorScheme.secondary,
               isScrollable: true,
               tabs: _buildTabs(tracker),
               onTap: (index) {
-                tracker.character = tracker.characters[index];
+                tracker.setActiveCharacter(index);
               },
             ),
             actions: [

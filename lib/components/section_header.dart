@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:maple_daily_tracker/extensions/color_extensions.dart';
 import 'package:maple_daily_tracker/extensions/enum_extensions.dart';
-import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
 class SectionHeader extends StatelessWidget {

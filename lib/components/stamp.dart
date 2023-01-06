@@ -24,9 +24,9 @@ class _StampState extends State<Stamp> with SingleTickerProviderStateMixin {
           height: constraints.maxHeight,
         )
             .animate()
-            .scale(begin: 4.0, end: 1.0, duration: 250.milliseconds)
+            .scaleX(begin: 4.0, end: 1.0, duration: 250.milliseconds)
             .then()
-            .shake(hz: 12, curve: Curves.easeInOutCubic)
+            .shake(hz: 4, curve: Curves.easeInOutCubic)
             .shimmer();
       },
     );

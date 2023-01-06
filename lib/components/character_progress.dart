@@ -3,7 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:maple_daily_tracker/components/stamp.dart';
 import 'package:maple_daily_tracker/extensions/enum_extensions.dart';
 import 'package:maple_daily_tracker/models/action-section.dart';
-import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 

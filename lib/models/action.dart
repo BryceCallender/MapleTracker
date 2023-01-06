@@ -16,4 +16,19 @@ class Action {
       removalTime: removalTime ?? this.removalTime
     );
   }
+
+  Action.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        order = json['order'],
+        done = json['done'],
+        isTemp = json['isTemp'],
+        removalTime = json['removalTime'];
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'order': order,
+    'done': done,
+    'isTemp': isTemp,
+    'removalTime': removalTime
+  };
 }

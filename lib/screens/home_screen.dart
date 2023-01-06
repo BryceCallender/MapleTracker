@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../components/progress_report.dart';
 import '../components/timing.dart';
 import '../components/tracker_section.dart';
@@ -16,7 +15,7 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: SizedBox.expand(
                     child: TrackerSection(),
                   ),

@@ -1,6 +1,10 @@
-extension DurationUtils on Duration {
+extension DurationUtils on Duration? {
   String toDisplayFormat() {
-    var seconds = inSeconds;
+    if (this == null) {
+      return "Calculating...";
+    }
+
+    var seconds = this!.inSeconds;
     final days = seconds ~/ Duration.secondsPerDay;
     seconds -= days * Duration.secondsPerDay;
     final hours = seconds ~/ Duration.secondsPerHour;

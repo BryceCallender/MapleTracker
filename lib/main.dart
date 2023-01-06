@@ -1,22 +1,22 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:maple_daily_tracker/components/locked_popup_item.dart';
+import 'package:maple_daily_tracker/screens/home_screen.dart';
 import 'package:maple_daily_tracker/screens/login_screen.dart';
-import 'package:maple_daily_tracker/screens/splash_screen.dart';
-import 'package:maple_daily_tracker/screens/welcome_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:maple_daily_tracker/services/authentication_service.dart';
+import 'package:maple_daily_tracker/services/database_service.dart';
+import 'package:supabase_auth_ui/supabase_auth_ui.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_size/window_size.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:mime/mime.dart';
 
-import 'firebase_options.dart';
+import 'constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,18 +26,23 @@ void main() async {
     setWindowMinSize(const Size(1000, 600));
   }
 
-  runApp(SplashScreen());
+  //runApp(SplashScreen());
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  await Supabase.initialize(
+    url: SUPABASE_URL,
+    anonKey: SUPABASE_ANNON_KEY,
   );
 
   List<SingleChildWidget> providers = [
     ChangeNotifierProvider<TrackerModel>(
       create: (_) => TrackerModel(),
     ),
-    StreamProvider<User?>(
-      create: (_) => FirebaseAuth.instance.userChanges(),
+    ChangeNotifierProvider<AuthenticationService>(
+      create: (_) => AuthenticationService(Supabase.instance.client.auth),
+    ),
+    StreamProvider<AuthState?>(
+      create: (context) =>
+          context.read<AuthenticationService>().authStateChanges,
       initialData: null,
     )
   ];
@@ -55,12 +60,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const mainColor = Colors.blue;
+    const accentColor = Colors.tealAccent;
+
     return MaterialApp(
       title: 'Maple Tracker',
       theme: ThemeData.dark().copyWith(
+        colorScheme: ThemeData.dark()
+            .colorScheme
+            .copyWith(primary: mainColor, secondary: accentColor),
         useMaterial3: true,
         dividerColor: Colors.transparent,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.blue),
+        appBarTheme: AppBarTheme(backgroundColor: mainColor),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
@@ -71,7 +82,7 @@ class MyApp extends StatelessWidget {
             padding: MaterialStateProperty.all<EdgeInsets>(
               const EdgeInsets.all(24),
             ),
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+            backgroundColor: MaterialStateProperty.all<Color>(mainColor),
             foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
           ),
         ),
@@ -93,22 +104,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool _showWelcome = true;
   final double kAvatarSize = 20;
   final double kAvatarSizeLarge = 40;
+  DatabaseService dbService = DatabaseService(supabase);
+  late final Stream _characterStream;
+  String? _avatarUrl;
 
   @override
   void initState() {
     super.initState();
-    getSharedPrefWelcomeState();
-  }
-
-  Future getSharedPrefWelcomeState() async {
-    var prefs = await SharedPreferences.getInstance();
-    var showWelcome = prefs.getBool("show_welcome_screen") ?? true;
-    setState(() {
-      _showWelcome = showWelcome;
-    });
+    getProfile();
+    _characterStream = dbService.listenToCharacters();
   }
 
   @override
@@ -118,17 +124,20 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         automaticallyImplyLeading: false,
         actions: [
-          Consumer<User?>(
-            builder: (context, user, child) {
+          Consumer<AuthState?>(
+            builder: (context, authState, child) {
+              if (supabase.auth.currentUser == null) return Container();
+
               return PopupMenuButton(
                 position: PopupMenuPosition.under,
-                icon: (user != null && user.photoURL != null)
+                icon: (_avatarUrl != null)
                     ? CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: kAvatarSize + 1,
                         child: CircleAvatar(
-                          backgroundImage: NetworkImage(user.photoURL!),
-                        ))
+                          backgroundImage: NetworkImage(_avatarUrl!),
+                        ),
+                      )
                     : CircleAvatar(
                         backgroundColor: Colors.tealAccent,
                         child: const Icon(Icons.person_rounded),
@@ -144,31 +153,38 @@ class _MyHomePageState extends State<MyHomePage> {
                             "Account",
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
-                          SizedBox(height: 4.0,),
-                          Text(user?.email ?? "")
+                          SizedBox(
+                            height: 4.0,
+                          ),
+                          Text(supabase.auth.currentUser?.email ?? "")
                         ],
                       ),
                     ),
                     LockedPopupItem(
                       child: Center(
-                        child: CircleAvatar(
-                          radius: kAvatarSizeLarge + 1,
-                          backgroundColor: Colors.white,
-                          child: CircleAvatar(
-                            radius: kAvatarSizeLarge,
-                            backgroundImage: NetworkImage(user?.photoURL ?? ""),
-                          ),
-                        ),
+                        child: (_avatarUrl != null)
+                            ? CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: kAvatarSizeLarge + 1,
+                                child: CircleAvatar(
+                                  radius: kAvatarSizeLarge,
+                                  backgroundImage: NetworkImage(_avatarUrl!),
+                                ),
+                              )
+                            : CircleAvatar(
+                                backgroundColor: Colors.tealAccent,
+                                child: const Icon(Icons.person_rounded),
+                              ),
                       ),
                       onTap: () async {
-                        _handleImageUpload(user);
+                        _handleImageUpload();
                       },
                     ),
                     LockedPopupItem(
                       child: Center(
                         child: TextButton(
                           onPressed: () async {
-                            _handleImageUpload(user);
+                            _handleImageUpload();
                           },
                           child: Text("Upload Image"),
                         ),
@@ -179,7 +195,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         leading: Icon(Icons.logout),
                         title: Text("Logout"),
                       ),
-                      onTap: () {},
+                      onTap: () async {
+                        await context.read<AuthenticationService>().signOut();
+                      },
                     )
                   ];
                 },
@@ -188,24 +206,70 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: _showWelcome ? WelcomeScreen() : LoginScreen(),
+      body: StreamBuilder(
+        stream: _characterStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Text(snapshot.data.toString());
+          }
+
+          return Container();
+        }
+      ) //AuthenticationWrapper(),
     );
   }
 
-  Future<Null> _handleImageUpload(User? user) async {
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(type: FileType.image);
+  Future<Null> _handleImageUpload() async {
+    var result = await FilePicker.platform
+        .pickFiles(withData: true, type: FileType.image);
 
     if (result != null && result.files.length > 0) {
-      PlatformFile file = result.files.first;
-      String? extension = result.files.first.extension;
+      final file = result.files.first;
+      final filePath = file.path;
+      final extension = result.files.first.extension;
+      final bytes = file.bytes;
+      final mimeType = filePath != null ? lookupMimeType(filePath) : null;
 
-      // Upload file
-      var task = await FirebaseStorage.instance
-          .ref('ProfilePictures/${user?.uid}/${user?.uid}.${extension}')
-          .putFile(File(file.path!));
+      if (bytes == null) {
+        return;
+      }
 
-      task.ref.getDownloadURL().then((url) => user?.updatePhotoURL(url));
+      final fileName = '${DateTime.now().toIso8601String()}.$extension';
+
+      await dbService.uploadBinary(fileName, bytes, mimeType);
+      final imageUrlResponse = await dbService.createdSignedImageUrl(fileName);
+
+      setState(() {
+        _avatarUrl = imageUrlResponse;
+      });
+
+      final userId = supabase.auth.currentUser!.id;
+      await dbService.upsertProfile(userId, _avatarUrl);
     }
+  }
+
+  Future<void> getProfile() async {
+    try {
+      final userId = supabase.auth.currentUser!.id;
+      final data = await dbService.getProfile(userId);
+
+      setState(() {
+        _avatarUrl = (data['avatar_url'] ?? '') as String;
+      });
+    } on PostgrestException catch (error) {
+    } catch (error) {}
+  }
+}
+
+class AuthenticationWrapper extends StatelessWidget {
+  const AuthenticationWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (supabase.auth.currentUser != null) {
+      return HomeScreen();
+    }
+
+    return LoginScreen();
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:maple_daily_tracker/components/add_action_dialog.dart';
 import 'package:maple_daily_tracker/components/custom_labeled_checkbox.dart';
-import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
 import '../models/action-type.dart';
