@@ -44,9 +44,9 @@ class _AddActionDialogState extends State<AddActionDialog> {
                       return 'Please enter a name';
                     }
 
-                    if (!tracker.isActionAvailable(value, widget.type)) {
-                      return 'Name is already used';
-                    }
+                    //if (!tracker.isActionAvailable(value, widget.type)) {
+                    //  return 'Name is already used';
+                    //}
 
                     return null;
                   },
@@ -79,10 +79,10 @@ class _AddActionDialogState extends State<AddActionDialog> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   var tracker = Provider.of<TrackerModel>(context, listen: false);
-                  tracker.addAction(
-                    widget.type,
-                    Maple.Action(name: _actionName.text, done: false),
-                  );
+                  // tracker.addAction(
+                  //   widget.type,
+                  //   Maple.Action(name: _actionName.text, done: false),
+                  // );
                   Navigator.of(context).pop();
                 }
               },

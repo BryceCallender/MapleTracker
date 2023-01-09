@@ -58,7 +58,6 @@ class CustomLabeledCheckbox extends StatelessWidget {
   }
 
   void _onChanged() {
-    print(value);
     if (value != null) {
       onChanged(!(value!));
     } else {

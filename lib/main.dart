@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:maple_daily_tracker/components/locked_popup_item.dart';
 import 'package:maple_daily_tracker/screens/home_screen.dart';
 import 'package:maple_daily_tracker/screens/login_screen.dart';
 import 'package:maple_daily_tracker/services/authentication_service.dart';
 import 'package:maple_daily_tracker/services/database_service.dart';
+import 'package:menubar/menubar.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_size/window_size.dart';
@@ -26,7 +28,26 @@ void main() async {
     setWindowMinSize(const Size(1000, 600));
   }
 
-  //runApp(SplashScreen());
+  if (!kIsWeb) {
+    final menu = <NativeSubmenu>[
+      NativeSubmenu(
+        label: 'File',
+        children: [
+          NativeMenuItem(
+            label: 'Exit',
+            onSelected: () => FlutterWindowClose.closeWindow(),
+          ),
+        ],
+      ),
+      NativeSubmenu(label: 'Help', children: [
+        NativeMenuItem(
+          label: 'About',
+          onSelected: () => {},
+        ),
+      ]),
+    ];
+    setApplicationMenu(menu);
+  }
 
   await Supabase.initialize(
     url: SUPABASE_URL,
@@ -35,7 +56,9 @@ void main() async {
 
   List<SingleChildWidget> providers = [
     ChangeNotifierProvider<TrackerModel>(
-      create: (_) => TrackerModel(),
+      create: (_) => TrackerModel(
+        dbService: DatabaseService(supabase),
+      ),
     ),
     ChangeNotifierProvider<AuthenticationService>(
       create: (_) => AuthenticationService(Supabase.instance.client.auth),
@@ -107,14 +130,12 @@ class _MyHomePageState extends State<MyHomePage> {
   final double kAvatarSize = 20;
   final double kAvatarSizeLarge = 40;
   DatabaseService dbService = DatabaseService(supabase);
-  late final Stream _characterStream;
   String? _avatarUrl;
 
   @override
   void initState() {
     super.initState();
     getProfile();
-    _characterStream = dbService.listenToCharacters();
   }
 
   @override
@@ -206,16 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: StreamBuilder(
-        stream: _characterStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Text(snapshot.data.toString());
-          }
-
-          return Container();
-        }
-      ) //AuthenticationWrapper(),
+      body: AuthenticationWrapper(),
     );
   }
 
@@ -257,6 +269,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _avatarUrl = (data['avatar_url'] ?? '') as String;
       });
     } on PostgrestException catch (error) {
+      print(error);
     } catch (error) {}
   }
 }

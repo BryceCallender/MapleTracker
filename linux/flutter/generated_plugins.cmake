@@ -3,7 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  desktop_webview_auth
+  flutter_window_close
+  menubar
   url_launcher_linux
   window_size
 )

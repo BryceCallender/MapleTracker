@@ -14,10 +14,6 @@ class ResetHelper {
     return calcResetTime(days: days);
   }
 
-  bool hasReset(Duration timeTillReset) {
-    return false;
-  }
-
   int daysTillWeekly(int resetDay) {
     var utcNow = DateTime.now().toUtc();
     var dayOfWeek = utcNow.weekday;

@@ -4,7 +4,8 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
-  desktop_webview_auth
+  flutter_window_close
+  menubar
   url_launcher_windows
   window_size
 )

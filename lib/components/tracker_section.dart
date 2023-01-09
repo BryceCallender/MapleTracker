@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:maple_daily_tracker/components/character_actions.dart';
 import 'package:maple_daily_tracker/components/confirmation_dialog.dart';
 import 'package:maple_daily_tracker/components/section.dart';
+import 'package:maple_daily_tracker/constants.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
@@ -9,78 +12,74 @@ import '../models/character.dart';
 import 'add_character_dialog.dart';
 
 class TrackerSection extends StatefulWidget {
-  const TrackerSection({Key? key}) : super(key: key);
+  const TrackerSection({Key? key, required this.characters}) : super(key: key);
+
+  final List<Character> characters;
 
   @override
   State<TrackerSection> createState() => _TrackerSectionState();
 }
 
 class _TrackerSectionState extends State<TrackerSection>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(
+        initialIndex: 0, length: widget.characters.length, vsync: this);
+
+    Provider.of<TrackerModel>(context, listen: false)
+        .setTabController(_tabController);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TrackerModel>(builder: (context, tracker, child) {
-      var themeData = Theme.of(context);
+    var themeData = Theme.of(context);
 
-      return DefaultTabController(
-        initialIndex: 0,
-        length: tracker.characters.length,
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            flexibleSpace: TabBar(
-              indicatorColor: themeData.colorScheme.secondary,
-              isScrollable: true,
-              tabs: _buildTabs(tracker),
-              onTap: (index) {
-                tracker.setActiveCharacter(index);
-              },
-            ),
-            actions: [
-              IconButton(
-                onPressed: () => _dialogBuilder(context),
-                icon: Icon(Icons.add),
-              )
-            ],
-          ),
-          body: TabBarView(
-            children: tracker.characters
-                .map(
-                  (Character character) => SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Section(
-                          title: "Dailies",
-                          type: ActionType.dailies,
-                        ),
-                        Section(
-                          title: "Weekly Bosses",
-                          type: ActionType.weeklyBoss,
-                        ),
-                        Section(
-                          title: "Weekly Quests",
-                          type: ActionType.weeklyQuest,
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        flexibleSpace: TabBar(
+          controller: _tabController,
+          indicatorColor: themeData.colorScheme.secondary,
+          isScrollable: true,
+          tabs: _buildTabs(widget.characters),
         ),
-      );
-    });
+        actions: [
+          IconButton(
+            onPressed: () => _dialogBuilder(context),
+            icon: Icon(Icons.add),
+          )
+        ],
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: widget.characters
+            .map(
+              (character) => SingleChildScrollView(
+                child: CharacterActions(
+                  characterId: character.id,
+                  sections: character.sections,
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
   }
 
-  List<Widget> _buildTabs(TrackerModel tracker) {
+  List<Widget> _buildTabs(List<Character>? characters) {
     var tabs = <Widget>[];
 
-    for (var character in tracker.characters) {
+    for (var character in characters ?? []) {
       tabs.add(Tab(
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -96,7 +95,7 @@ class _TrackerSectionState extends State<TrackerSection>
                   action: SnackBarAction(
                     label: 'Undo',
                     onPressed: () {
-                      tracker.add(character);
+                      //add char
                     },
                   ),
                 );
@@ -105,7 +104,7 @@ class _TrackerSectionState extends State<TrackerSection>
                   context: context,
                   builder: (context) => ConfirmationDialog(
                     onAccept: () {
-                      tracker.remove(character);
+                      //remove char
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     },
                     onReject: () {},

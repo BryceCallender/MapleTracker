@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:maple_daily_tracker/components/add_action_dialog.dart';
 import 'package:maple_daily_tracker/components/custom_labeled_checkbox.dart';
+import 'package:maple_daily_tracker/models/action-type.dart';
+import 'package:maple_daily_tracker/models/action.dart' as Maple;
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
-
-import '../models/action-type.dart';
-import '../models/action.dart' as Maple;
 
 class CheckboxSection extends StatelessWidget {
   const CheckboxSection(
@@ -68,13 +67,10 @@ class CheckboxSection extends StatelessWidget {
                         value: item.done,
                         onChanged: (value) {
                           item.done = !item.done;
-                          tracker.updateAction(type, item);
+                          tracker.toggleAction(item);
                         },
                       )
-                  ]
-                      .animate(interval: 100.ms)
-                      .fadeIn(duration: 200.ms)
-                      .move(
+                  ].animate(interval: 100.ms).fadeIn(duration: 200.ms).move(
                         begin: const Offset(-16, 0),
                         curve: Curves.easeOutQuad,
                       ),
@@ -89,11 +85,12 @@ class CheckboxSection extends StatelessWidget {
 
   Future<void> _dialogBuilder(BuildContext context) {
     return showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return AddActionDialog(
-            type: type,
-          );
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return AddActionDialog(
+          type: type,
+        );
+      },
+    );
   }
 }

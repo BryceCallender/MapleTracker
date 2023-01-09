@@ -83,17 +83,17 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
         ),
         TextButton(
           onPressed: () {
-            var tracker = Provider.of<TrackerModel>(context, listen: false);
-            tracker.add(
-              Character(
-                name: _nameController.text.trim(),
-                sections: {
-                  ActionType.dailies: ActionSection.empty(ActionType.dailies),
-                  ActionType.weeklyBoss: ActionSection.empty(ActionType.weeklyBoss),
-                  ActionType.weeklyQuest: ActionSection.empty(ActionType.weeklyQuest)
-                }
-              ),
-            );
+            // var tracker = Provider.of<TrackerModel>(context, listen: false);
+            // tracker.add(
+            //   Character(
+            //     name: _nameController.text.trim(),
+            //     sections: {
+            //       ActionType.dailies: ActionSection.empty(ActionType.dailies),
+            //       ActionType.weeklyBoss: ActionSection.empty(ActionType.weeklyBoss),
+            //       ActionType.weeklyQuest: ActionSection.empty(ActionType.weeklyQuest)
+            //     }
+            //   ),
+            // );
             Navigator.of(context).pop();
           },
           child: const Text('Add'),

@@ -7,24 +7,24 @@ import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
 class Section extends StatelessWidget {
-  const Section({Key? key, required this.title, required this.type})
+  const Section({Key? key, required this.title, required this.characterId, required this.section})
       : super(key: key);
 
   final String title;
-  final ActionType type;
+  final int characterId;
+  final ActionSection section;
 
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
     return Consumer<TrackerModel>(
       builder: (context, tracker, child) {
-        var section = tracker.character.sections[type];
-        return trackerCard(textTheme, tracker, section!);
+        return trackerCard(textTheme, tracker);
       },
     );
   }
 
-  Widget trackerCard(TextTheme textTheme, TrackerModel tracker, ActionSection section) {
+  Widget trackerCard(TextTheme textTheme, TrackerModel tracker) {
     return Card(
       child: Container(
         padding: const EdgeInsets.all(16.0),
@@ -35,7 +35,7 @@ class Section extends StatelessWidget {
               children: [
                 IconButton(
                     onPressed: () {
-                      tracker.toggleSection(section.actionType);
+                      tracker.toggleSection(characterId, section.actionType);
                     },
                     icon: section.isActive
                         ? Icon(CupertinoIcons.eye_fill)
@@ -54,14 +54,14 @@ class Section extends StatelessWidget {
                 children: [
                   CheckboxSection(
                     label: "Unfinished",
-                    type: type,
+                    type: section.actionType,
                     canAdd: true,
-                    items: section.actions.values.where((a) => !a.done).toList(),
+                    items: section.actionList.where((a) => !a.done).toList(),
                   ),
                   CheckboxSection(
                     label: "Finished",
-                    type: type,
-                    items: section.actions.values.where((a) => a.done).toList(),
+                    type: section.actionType,
+                    items: section.actionList.where((a) => a.done).toList(),
                   ),
                 ],
               ),

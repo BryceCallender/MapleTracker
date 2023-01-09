@@ -24,26 +24,26 @@ class SectionHeader extends StatelessWidget {
             builder: (context, tracker, child) {
               return Row(
                 children: [
-                  for (var section in tracker.character.sections.values) ...[
-                    ActionChip(
-                      avatar: stateToIcon(section.isActive, activeColor),
-                      label: Text(
-                        section.actionType.toProperName(),
-                        style: TextStyle(
-                          color:
-                              (section.isActive ? activeColor : backgroundColor)
-                                  .toLuminanceColor(),
-                        ),
-                      ),
-                      backgroundColor: section.isActive ? activeColor : null,
-                      onPressed: () {
-                        tracker.toggleSection(section.actionType);
-                      },
-                    ),
-                    SizedBox(
-                      width: 4.0,
-                    ),
-                  ],
+                  //for (var section in tracker.character.sections.values) ...[
+                  //   ActionChip(
+                  //     avatar: stateToIcon(section.isActive, activeColor),
+                  //     label: Text(
+                  //       section.actionType.toProperName(),
+                  //       style: TextStyle(
+                  //         color:
+                  //             (section.isActive ? activeColor : backgroundColor)
+                  //                 .toLuminanceColor(),
+                  //       ),
+                  //     ),
+                  //     backgroundColor: section.isActive ? activeColor : null,
+                  //     onPressed: () {
+                  //       //tracker.toggleSection(section.actionType);
+                  //     },
+                  //   ),
+                  //   SizedBox(
+                  //     width: 4.0,
+                  //   ),
+                  // ],
                 ],
               );
             },

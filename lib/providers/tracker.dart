@@ -1,118 +1,85 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:maple_daily_tracker/models/action-type.dart';
 import 'package:maple_daily_tracker/models/character.dart';
-
-import '../models/action-type.dart';
-import '../models/action.dart' as Maple;
+import 'package:maple_daily_tracker/models/action.dart' as Maple;
+import 'package:maple_daily_tracker/services/database_service.dart';
 
 class TrackerModel extends ChangeNotifier {
   final List<Character> _characters = [];
-  late Character _character;
+  late DatabaseService dbService;
 
-  Character get character => _character;
-  set character(Character character) {
-    _character = character;
-    notifyListeners();
-  }
+  int _tabIndex = 0;
+  late TabController _tabController;
 
-  bool hasCompletedActions(Character character) {
-    return character.hasCompletedActions();
-  }
+  TrackerModel({required this.dbService});
 
   /// An unmodifiable view of the items in the cart.
   UnmodifiableListView<Character> get characters =>
       UnmodifiableListView(_characters);
 
-  void add(Character character) {
-    _characters.add(character);
-    _character = character;
-    notifyListeners();
+  int get tabIndex => _tabIndex;
+
+  Future<List<Character>> getCharacters(String subject) async {
+    return dbService.fetchCharacters(subject);
   }
 
-  void remove(Character character) {
-    _characters.remove(character);
+  Stream<List<Character>> listenToCharacters(String subject) {
+    return dbService.listenToCharacters().map((maps) {
+      _characters.clear();
+      return maps.map((ch) {
+        final character = Character.fromJson(ch);
+        _characters.add(character);
+        return character;
+      }).toList();
+    });
+  }
 
-    //downshift if they are on the character they deleted
-    if (_character == character && _characters.length > 0) {
-      _character = _characters[_characters.length - 1];
+  Stream<List<Maple.Action>> listenToActions(int characterId) {
+    return dbService.listenToActions(characterId).map((maps) => maps.map((a) {
+          final action = Maple.Action.fromJson(a);
+          var character =
+              _characters.where((c) => c.id == action.characterId).single;
+          character.sections[action.actionType]?.addAction(action);
+          return action;
+        }).toList());
+  }
+
+  void resetActions(ActionType actionType) {
+    _characters.forEach((character) async {
+      var actions = character.sections[actionType]!.actionList;
+      await dbService.resetActions(actions);
+    });
+  }
+
+  void toggleAction(Maple.Action action) async {
+    await dbService.updateAction(action);
+  }
+
+  void toggleSection(int characterId, ActionType type) async {
+    var character = _characters.where((c) => c.id == characterId).single;
+    var hiddenActions = character.hiddenSections;
+
+    if (hiddenActions.contains(type.index)) {
+      hiddenActions.remove(type.index);
+    } else {
+      hiddenActions.add(type.index);
     }
 
-    notifyListeners();
+    await dbService.updateHiddenSections(
+        characterId, hiddenActions.toSet().toList());
   }
 
-  void toggleSection(ActionType type) {
-    var currentSection = character.sections[type]!;
-    currentSection.isActive = !currentSection.isActive;
-    notifyListeners();
+  void saveResetTimes(String subject) async {
+    await dbService.updateUserResetTimes(subject);
   }
 
-  void addAction(ActionType type, Maple.Action action) {
-    var currentSection = character.sections[type]!;
-    var actions = currentSection.actions;
-
-    action.order = actions.length;
-    actions[action.name] = action;
-    notifyListeners();
+  void setTabController(TabController tabController) {
+    _tabController = tabController;
   }
 
-  void updateAction(ActionType type, Maple.Action action) {
-    var currentSection = character.sections[type]!;
-    var actions = currentSection.actions;
-    var oldAction = actions.values.firstWhere((a) => a.name == action.name);
-    actions[oldAction.name] = oldAction.copy(done: action.done);
-
-    notifyListeners();
-  }
-
-  bool isNameAvailable(String name) {
-    return _characters.where((c) => c.name == name).isEmpty;
-  }
-
-  bool isActionAvailable(String? name, ActionType type) {
-    return _character.sections[type]?.actions.values.where((a) => a.name == name).isEmpty ?? true;
-  }
-
-  void clear () {
-    _characters.clear();
-  }
-
-  void resetDailies() {
-    for(var character in characters) {
-      character.resetSection(ActionType.dailies);
-    }
-    notifyListeners();
-  }
-
-  void resetWeeklyBosses() {
-    for(var character in characters) {
-      character.resetSection(ActionType.weeklyBoss);
-    }
-    notifyListeners();
-  }
-
-  void resetWeeklyQuests() {
-    for(var character in characters) {
-      character.resetSection(ActionType.weeklyQuest);
-    }
-    notifyListeners();
-  }
-
-  void setActiveCharacter(int index) {
-    _character = _characters[index];
-    notifyListeners();
-  }
-
-  void subscribeToData() {
-    // var uid = FirebaseAuth.instance.currentUser?.uid;
-    // var charactersRef = FirebaseDatabase.instance.ref('users/$uid');
-    // charactersRef.onValue.listen((DatabaseEvent event) {
-    //   final map = Map<String, dynamic>.from(event.snapshot.value as Map<dynamic, dynamic>);
-    //   for (var character in map.values) {
-    //     final characterMap = Map<String, dynamic>.from(character);
-    //     _characters.add(Character.fromJson(characterMap));
-    //   }
-    //   _character = _characters.first;
-    // });
+  void changeTab(int index) {
+    _tabController.animateTo(index);
   }
 }

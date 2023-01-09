@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maple_daily_tracker/components/timer_text.dart';
 import 'package:maple_daily_tracker/extensions/duration_extensions.dart';
 import 'package:maple_daily_tracker/helpers/reset_helper.dart';
+import 'package:maple_daily_tracker/models/action-type.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
@@ -37,20 +38,20 @@ class _TimingState extends State<Timing> {
         weeklyBossReset = ResetHelper().calcWeeklyResetTime();
         weeklyQuestReset =
             ResetHelper().calcWeeklyResetTime(resetDay: DateTime.monday);
-
-        if (dailyReset! <= Duration(seconds: 2)) {
-          print('daily resetting!');
-          tracker.resetDailies();
+        
+        if (dailyReset! < Duration(seconds: 1)) {
+          print('reset dailies');
+          tracker.resetActions(ActionType.dailies);
         }
 
-        if (weeklyBossReset! <= Duration(seconds: 2)) {
-          print('weekly bosses resetting!');
-          tracker.resetWeeklyBosses();
+        if (weeklyBossReset! < Duration(seconds: 1)) {
+          print('reset weekly bosses');
+          tracker.resetActions(ActionType.weeklyBoss);
         }
 
-        if (weeklyQuestReset! <= Duration(seconds: 2)) {
-          print('weekly quest resetting!');
-          tracker.resetWeeklyQuests();
+        if (weeklyQuestReset! < Duration(seconds: 1)) {
+          print('reset weekly quests');
+          tracker.resetActions(ActionType.weeklyQuest);
         }
       });
     });

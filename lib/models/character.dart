@@ -4,23 +4,46 @@ import 'action-section.dart';
 import 'action-type.dart';
 
 class Character {
+  final int id;
   final String name;
   final int? order;
-  final Map<ActionType, ActionSection> sections;
+  final DateTime? createdOn;
+  final String subjectId;
+  final List<int> hiddenSections;
+  Map<ActionType, ActionSection> sections;
 
-  Character({required this.name, this.order, required this.sections});
+  Character(
+      {required this.id,
+      required this.name,
+      required this.order,
+      required this.createdOn,
+      required this.subjectId,
+      required this.hiddenSections,
+      required this.sections});
 
-  @override
-  int get hashCode => name.hashCode;
-
-  @override
-  bool operator ==(Object other) => other is Character && other.name == name;
+  Character.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'],
+        order = json['order'],
+        createdOn = DateTime.parse(json['created']),
+        subjectId = json['subject_id'],
+        hiddenSections = json['hidden_sections'] == null ? [] : List<int>.from(json['hidden_sections']),
+        sections = {} {
+    sections = {
+      ActionType.dailies: ActionSection.empty(ActionType.dailies,
+          isHidden: hiddenSections.contains(ActionType.dailies.index)),
+      ActionType.weeklyBoss: ActionSection.empty(ActionType.weeklyBoss,
+          isHidden: hiddenSections.contains(ActionType.weeklyBoss.index)),
+      ActionType.weeklyQuest: ActionSection.empty(ActionType.weeklyQuest,
+          isHidden: hiddenSections.contains(ActionType.weeklyQuest.index))
+    };
+  }
 
   bool hasCompletedActions() {
     int completedSections = 0;
     int visibleSections = 0;
 
-    for(var section in sections.values) {
+    for (var section in sections.values) {
       if (!section.isActive) {
         continue;
       }
@@ -32,42 +55,5 @@ class Character {
     }
 
     return visibleSections > 0 && completedSections == visibleSections;
-  }
-
-  void resetSection(ActionType action) {
-    sections[action]!.reset();
-  }
-
-  Character.fromJson(Map<String, dynamic> json)
-      : name = json['name'],
-        order = json['order'],
-        sections = toActionSections(json['sections']);
-
-  Map<String, dynamic> toJson() => {
-    'name': name,
-    'order': order,
-    'sections': convertSections()
-  };
-
-  Map<String, dynamic> convertSections () {
-    Map<String, dynamic> map = {};
-
-    sections.forEach((key, value) {
-      map[key.name] = value.toJson();
-    });
-
-    return map;
-  }
-
-  static Map<ActionType, ActionSection> toActionSections (dynamic sections) {
-    final mapTest = Map<String, dynamic>.from(sections);
-    final mappedSections = Map<ActionType, ActionSection>();
-
-    for (var section in mapTest.entries) {
-      var actionType = EnumToString.fromString(ActionType.values, section.key);
-      mappedSections[actionType!] = ActionSection.fromJson(Map<String, dynamic>.from(section.value));
-    }
-
-    return mappedSections;
   }
 }

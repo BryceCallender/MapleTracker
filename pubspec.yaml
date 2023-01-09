@@ -34,31 +34,29 @@ dependencies:
     git:
       url: https://github.com/google/flutter-desktop-embedding
       path: plugins/window_size
+
+  menubar:
+    git:
+      url: https://github.com/google/flutter-desktop-embedding
+      path: plugins/menubar
+
   cupertino_icons: ^1.0.5
-
-  #  firebase
-  firebase_auth: ^4.2.4
-#  firebase_auth_desktop: ^1.0.2
-  firebase_core: ^2.4.1
-  firebase_core_desktop: ^1.0.2
-  firebase_storage: ^11.0.10
-  firebase_ui_auth: ^1.1.6
-  firebase_database: ^10.0.9
-
   supabase_flutter: ^1.2.2
   supabase_auth_ui: ^0.0.1
   mime: ^1.0.3
 
   percent_indicator: ^4.2.2
-  provider: ^6.0.3
-  animations: ^2.0.4
+  provider: ^6.0.5
+  animations: ^2.0.7
   animated_text_kit: ^4.2.2
   shared_preferences: ^2.0.15
-  intl: ^0.17.0
-  flutter_animate: ^2.0.0
+  intl: ^0.18.0
+  flutter_animate: ^2.0.1
   sticky_headers: ^0.3.0+2
-  file_picker: ^5.1.0
+  file_picker: ^5.2.4
   enum_to_string: ^2.0.1
+  loading_animation_widget: ^1.2.0+4
+  flutter_window_close: ^0.2.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.11.0
