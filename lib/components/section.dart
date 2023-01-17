@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/checkbox_section.dart';
 import 'package:maple_daily_tracker/models/action-section.dart';
-import 'package:maple_daily_tracker/models/action-type.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 

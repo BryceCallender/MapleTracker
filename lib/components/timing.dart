@@ -19,6 +19,7 @@ class Timing extends StatefulWidget {
 class _TimingState extends State<Timing> {
   late DateTime utcNow;
   late Timer timer;
+  late bool resetFromOpen;
 
   Duration? dailyReset;
   Duration? weeklyBossReset;
@@ -27,8 +28,10 @@ class _TimingState extends State<Timing> {
   @override
   void initState() {
     super.initState();
+    resetFromOpen = false;
 
     var tracker = Provider.of<TrackerModel>(context, listen: false);
+    checkUserResetTime(tracker);
 
     utcNow = DateTime.now().toUtc();
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -38,20 +41,23 @@ class _TimingState extends State<Timing> {
         weeklyBossReset = ResetHelper().calcWeeklyResetTime();
         weeklyQuestReset =
             ResetHelper().calcWeeklyResetTime(resetDay: DateTime.monday);
+
+        if (tracker.user == null)
+          return;
         
         if (dailyReset! < Duration(seconds: 1)) {
           print('reset dailies');
-          tracker.resetActions(ActionType.dailies);
+          tracker.resetActions(tracker.user!.userId, ActionType.dailies);
         }
 
         if (weeklyBossReset! < Duration(seconds: 1)) {
           print('reset weekly bosses');
-          tracker.resetActions(ActionType.weeklyBoss);
+          tracker.resetActions(tracker.user!.userId, ActionType.weeklyBoss);
         }
 
         if (weeklyQuestReset! < Duration(seconds: 1)) {
           print('reset weekly quests');
-          tracker.resetActions(ActionType.weeklyQuest);
+          tracker.resetActions(tracker.user!.userId, ActionType.weeklyQuest);
         }
       });
     });
@@ -104,5 +110,32 @@ class _TimingState extends State<Timing> {
         ),
       ),
     );
+  }
+
+  void checkUserResetTime(TrackerModel tracker) {
+    var user = tracker.user;
+    var now = DateTime.now().toUtc();
+
+    if (user == null || resetFromOpen) {
+      return;
+    }
+
+    print('checking...');
+    if (user.nextDailyReset != null && now.isAfter(user.nextDailyReset!)) {
+      print('reset dailies');
+      tracker.resetActions(user.userId, ActionType.dailies);
+    }
+
+    if (user.nextWeeklyBossReset != null && now.isAfter(user.nextWeeklyBossReset!)) {
+      print('reset weekly bosses');
+      tracker.resetActions(user.userId, ActionType.weeklyBoss);
+    }
+
+    if (user.nextWeeklyQuestReset != null && now.isAfter(user.nextWeeklyQuestReset!)) {
+      print('reset weekly quests');
+      tracker.resetActions(user.userId, ActionType.weeklyQuest);
+    }
+
+    resetFromOpen = true;
   }
 }

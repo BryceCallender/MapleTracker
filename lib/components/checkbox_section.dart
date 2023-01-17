@@ -12,8 +12,8 @@ class CheckboxSection extends StatelessWidget {
       {Key? key,
       required this.label,
       required this.items,
-      this.canAdd,
-      required this.type})
+      required this.type,
+      this.canAdd})
       : super(key: key);
 
   final String label;
@@ -88,6 +88,7 @@ class CheckboxSection extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AddActionDialog(
+          actions: items,
           type: type,
         );
       },

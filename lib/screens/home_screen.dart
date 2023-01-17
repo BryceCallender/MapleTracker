@@ -6,7 +6,6 @@ import 'package:maple_daily_tracker/components/progress_report.dart';
 import 'package:maple_daily_tracker/components/timing.dart';
 import 'package:maple_daily_tracker/components/tracker_section.dart';
 import 'package:maple_daily_tracker/constants.dart';
-import 'package:maple_daily_tracker/models/action-type.dart';
 import 'package:maple_daily_tracker/models/character.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     final tracker = Provider.of<TrackerModel>(context, listen: false);
-    _characters = tracker.listenToCharacters(supabase.auth.currentUser!.id);
+    final subject = supabase.auth.currentUser!.id;
+    tracker.fetchUserInfo(subject);
+    _characters = tracker.listenToCharacters(subject);
 
     if (kIsWeb) {
       return;
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(8.0),
       child: StreamBuilder<List<Character>>(
         stream: _characters,
-        builder: (BuildContext context, snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Column(
               children: [

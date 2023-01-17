@@ -14,9 +14,9 @@ class SignUpScreen extends StatelessWidget {
       children: [
         SupaEmailAuth(
           authAction: SupaAuthAction.signUp,
-          redirectUrl: '/home',
-          onSuccess: (_) {
-
+          onSuccess: (response) {
+            print(response.user);
+            print(response.session);
           },
           metadataFields: [
             MetaDataField(

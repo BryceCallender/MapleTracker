@@ -28,45 +28,45 @@ class CharacterProgress extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => {tracker.changeTab(index)},
-      child: Stack(
-        fit: StackFit.loose,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Consumer<TrackerModel>(
+        builder: (context, tracker, child) {
+          return Stack(
+            fit: StackFit.loose,
             children: [
-              Text(character.name),
-              SizedBox(
-                height: 8.0,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(character.name),
+                  SizedBox(
+                    height: 8.0,
+                  ),
+                  trackerProgress(
+                    sections[ActionType.dailies]!,
+                    color,
+                  ),
+                  SizedBox(
+                    height: 6.0,
+                  ),
+                  trackerProgress(
+                    sections[ActionType.weeklyBoss]!,
+                    color,
+                  ),
+                  SizedBox(
+                    height: 6.0,
+                  ),
+                  trackerProgress(
+                    sections[ActionType.weeklyQuest]!,
+                    color,
+                  ),
+                ].animate().fadeIn(),
               ),
-              trackerProgress(
-                sections[ActionType.dailies]!,
-                color,
-              ),
-              SizedBox(
-                height: 6.0,
-              ),
-              trackerProgress(
-                sections[ActionType.weeklyBoss]!,
-                color,
-              ),
-              SizedBox(
-                height: 6.0,
-              ),
-              trackerProgress(
-                sections[ActionType.weeklyQuest]!,
-                color,
-              ),
-            ].animate().fadeIn(),
-          ),
-          Consumer<TrackerModel>(
-            builder: (context, tracker, child) {
-              return Visibility(
+              Visibility(
                 visible: character.hasCompletedActions(),
                 child: Positioned.fill(child: Stamp()),
-              );
-            },
-          )
-        ],
+              )
+            ],
+          );
+        },
       ),
     );
   }

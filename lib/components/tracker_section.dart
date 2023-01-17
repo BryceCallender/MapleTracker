@@ -47,18 +47,29 @@ class _TrackerSectionState extends State<TrackerSection>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        flexibleSpace: TabBar(
-          controller: _tabController,
-          indicatorColor: themeData.colorScheme.secondary,
-          isScrollable: true,
-          tabs: _buildTabs(widget.characters),
+        flexibleSpace: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorColor: themeData.colorScheme.secondary,
+                  isScrollable: true,
+                  tabs: _buildTabs(widget.characters),
+                ),
+              ),
+            ),
+            Container(
+              width: 50,
+              height: 50,
+              child: IconButton(
+                onPressed: () => _dialogBuilder(context),
+                icon: Icon(Icons.add),
+              ),
+            )
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () => _dialogBuilder(context),
-            icon: Icon(Icons.add),
-          )
-        ],
       ),
       body: TabBarView(
         controller: _tabController,
@@ -78,6 +89,10 @@ class _TrackerSectionState extends State<TrackerSection>
 
   List<Widget> _buildTabs(List<Character>? characters) {
     var tabs = <Widget>[];
+
+    // for (int i = 0; i < 5; i++) {
+    //   characters?.add(characters[0]);
+    // }
 
     for (var character in characters ?? []) {
       tabs.add(Tab(

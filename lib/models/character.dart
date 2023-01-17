@@ -39,6 +39,13 @@ class Character {
     };
   }
 
+  void hideSections() {
+    var actionTypes = ActionType.values;
+    for (var i = 0; i < actionTypes.length; i++) {
+      sections[actionTypes[i]]?.isActive = !hiddenSections.contains(actionTypes[i].index);
+    }
+  }
+
   bool hasCompletedActions() {
     int completedSections = 0;
     int visibleSections = 0;

@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateTimePicker extends StatefulWidget {
+  DateTimePicker(
+      {Key? key, required this.onDateSelected, required this.onTimeSelected})
+      : super(key: key);
+
+  final Function(DateTime) onDateSelected;
+  final Function(TimeOfDay) onTimeSelected;
+
   @override
   _DateTimePickerState createState() => _DateTimePickerState();
 }
@@ -22,16 +29,17 @@ class _DateTimePickerState extends State<DateTimePicker> {
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        initialDatePickerMode: DatePickerMode.day,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100),
+      context: context,
+      initialDate: selectedDate,
+      initialDatePickerMode: DatePickerMode.day,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
     );
     if (picked != null)
       setState(() {
         selectedDate = picked;
         _dateController.text = DateFormat.yMd().format(selectedDate);
+        widget.onDateSelected(picked);
       });
   }
 
@@ -47,6 +55,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
         _minute = selectedTime.minute.toString();
         _time = _hour + ' : ' + _minute;
         _timeController.text = _time;
+        widget.onTimeSelected(picked);
       });
   }
 
@@ -71,7 +80,9 @@ class _DateTimePickerState extends State<DateTimePicker> {
               Text(
                 'Choose Date',
               ),
-              SizedBox(height: 8.0,),
+              SizedBox(
+                height: 8.0,
+              ),
               InkWell(
                 onTap: () {
                   _selectDate(context);
@@ -92,14 +103,18 @@ class _DateTimePickerState extends State<DateTimePicker> {
               ),
             ],
           ),
-          SizedBox(height: 12.0,),
+          SizedBox(
+            height: 12.0,
+          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Choose Time',
               ),
-              SizedBox(height: 8.0,),
+              SizedBox(
+                height: 8.0,
+              ),
               InkWell(
                 onTap: () {
                   _selectTime(context);

@@ -4,7 +4,7 @@ import 'package:maple_daily_tracker/models/action-type.dart';
 class Action {
   final int? id;
   String name;
-  int? order;
+  int order;
   bool done;
   bool? isTemp;
   DateTime? removalTime;
@@ -16,12 +16,12 @@ class Action {
   Action({
     required this.id,
     required this.name,
+    required this.order,
     required this.done,
     required this.createdOn,
     required this.actionType,
     required this.characterId,
     this.updatedOn,
-    this.order,
     this.isTemp,
     this.removalTime
   });

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:maple_daily_tracker/components/locked_popup_item.dart';
@@ -10,7 +11,6 @@ import 'package:maple_daily_tracker/services/database_service.dart';
 import 'package:menubar/menubar.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:window_size/window_size.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
@@ -22,11 +22,6 @@ import 'constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
-    setWindowTitle('Maple Tracker');
-    setWindowMinSize(const Size(1000, 600));
-  }
 
   if (!kIsWeb) {
     final menu = <NativeSubmenu>[
@@ -54,6 +49,10 @@ void main() async {
     anonKey: SUPABASE_ANNON_KEY,
   );
 
+  FlutterWindowClose.setWindowShouldCloseHandler(() async {
+    return true;
+  });
+
   List<SingleChildWidget> providers = [
     ChangeNotifierProvider<TrackerModel>(
       create: (_) => TrackerModel(
@@ -64,8 +63,7 @@ void main() async {
       create: (_) => AuthenticationService(Supabase.instance.client.auth),
     ),
     StreamProvider<AuthState?>(
-      create: (context) =>
-          context.read<AuthenticationService>().authStateChanges,
+      create: (context) => supabase.auth.onAuthStateChange,
       initialData: null,
     )
   ];
@@ -76,6 +74,14 @@ void main() async {
       child: const MyApp(),
     ),
   );
+
+  doWhenWindowReady(() {
+    final initialSize = Size(1000, 600);
+    appWindow.minSize = initialSize;
+    appWindow.size = initialSize;
+    appWindow.title = 'Maple Tracker';
+    appWindow.show();
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -111,6 +117,10 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark,
+      // initialRoute: 'login',
+      // routes: {
+      //   'login': (_) => LoginScreen()
+      // },
       home: const MyHomePage(title: 'Maple Daily Tracker'),
       debugShowCheckedModeBanner: false,
     );

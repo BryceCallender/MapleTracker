@@ -3,10 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  bitsdojo_window_linux
   flutter_window_close
   menubar
   url_launcher_linux
-  window_size
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

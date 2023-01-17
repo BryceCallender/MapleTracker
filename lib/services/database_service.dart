@@ -19,7 +19,12 @@ class DatabaseService {
   Stream<List<dynamic>> listenToActions(int characterId) {
     return client
         .from("actions")
-        .stream(primaryKey: ['id']).eq("character_id", characterId);
+        .stream(primaryKey: ['id'])
+        .eq("character_id", characterId);
+  }
+
+  Future<Map<String, dynamic>> fetchUser(String subject) async {
+    return await client.from("users").select().eq("id", subject).single();
   }
 
   Future<void> addCharacter(Character character) async {
@@ -55,8 +60,8 @@ class DatabaseService {
         .update({'hidden_sections': hiddenSections}).match({'id': characterId});
   }
 
-  Future<void> addAction(Action action) async {
-    await client.from("actions").insert(action);
+  Future<Map<String, dynamic>> addAction(Action action) async {
+    return await client.from("actions").insert(action).select();
   }
 
   Future<void> updateAction(Action action) async {
@@ -76,11 +81,11 @@ class DatabaseService {
     await client.from("actions").delete().match({'id': actionId});
   }
 
-  Future<void> resetActions(List<Action> actions) async {
-    await client.from("actions").upsert(actions.map((a) {
-          a.done = false;
-          return a.toMap();
-        }).toList());
+  Future<void> resetActions(String subject, int actionType) async {
+    await client.rpc("clear_actions_of_type", params: {
+      'subject': subject,
+      'action_type_id': actionType
+    });
   }
 
   Future<Map<String, dynamic>> getProfile(String userId) async {
