@@ -1,7 +1,9 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:maple_daily_tracker/components/menubar.dart';
 import 'package:maple_daily_tracker/components/progress_report.dart';
 import 'package:maple_daily_tracker/components/timing.dart';
 import 'package:maple_daily_tracker/components/tracker_section.dart';
@@ -31,11 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (kIsWeb) {
       return;
     }
-
-    FlutterWindowClose.setWindowShouldCloseHandler(() async {
-      tracker.saveResetTimes(supabase.auth.currentUser!.id);
-      return true;
-    });
   }
 
   @override
@@ -48,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (snapshot.hasData) {
             return Column(
               children: [
+                Menubar(),
                 Expanded(
                   child: Row(
                     children: [

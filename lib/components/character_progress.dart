@@ -75,7 +75,7 @@ class CharacterProgress extends StatelessWidget {
     var isVisible = section.isActive;
     var completePercentage = section.percentage();
 
-    return createProgressIndicator(section.actionType.toProperName(),
+    return createProgressIndicator(section.actionType.name,
         completePercentage, color, isVisible);
   }
 

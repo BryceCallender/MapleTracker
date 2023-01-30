@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:maple_daily_tracker/mappers/mapper.dart';
 import 'package:maple_daily_tracker/models/action-type.dart';
 import 'package:maple_daily_tracker/models/character.dart';
 import 'package:maple_daily_tracker/models/action.dart' as Maple;
+import 'package:maple_daily_tracker/models/maple-class.dart';
+import 'package:maple_daily_tracker/models/old-maple-tracker.dart' as OMT;
+import 'package:maple_daily_tracker/models/profile.dart';
 import 'package:maple_daily_tracker/models/user.dart';
 import 'package:maple_daily_tracker/services/database_service.dart';
 import 'package:collection/collection.dart';
@@ -11,6 +15,7 @@ class TrackerModel extends ChangeNotifier {
   final List<Character> _characters = [];
   late DatabaseService dbService;
   User? user;
+  Profile? profile;
 
   int _tabIndex = 0;
   late TabController _tabController;
@@ -29,22 +34,28 @@ class TrackerModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchProfileInfo(String subject) async {
+    profile = Profile.fromJson(await dbService.getProfile(subject));
+    notifyListeners();
+  }
+
   Future<List<Character>> getCharacters(String subject) async {
     return dbService.fetchCharacters(subject);
   }
 
   Stream<List<Character>> listenToCharacters(String subject) {
     return dbService.listenToCharacters().map((maps) {
+      print(maps);
       return maps.map((ch) {
         final character = Character.fromJson(ch);
-        final existingCharacter = _characters.firstWhereOrNull((element) => element.id == character.id);
+        final existingCharacter = _characters
+            .firstWhereOrNull((element) => element.id == character.id);
 
         if (existingCharacter != null) {
           existingCharacter.copyWith(
-            name: character.name,
-            hiddenSections: character.hiddenSections,
-            order: character.order
-          );
+              name: character.name,
+              hiddenSections: character.hiddenSections,
+              order: character.order);
           existingCharacter.hideSections();
           return existingCharacter;
         }
@@ -88,23 +99,80 @@ class TrackerModel extends ChangeNotifier {
 
     await dbService.updateHiddenSections(
         characterId, hiddenActions.toSet().toList());
+    notifyListeners();
   }
 
-  void addAction(Maple.Action action) async {
+  Future<Map<String, dynamic>> addCharacter(Character character) async {
+    return await dbService.addCharacter(character);
+  }
+
+  void upsertAction(Maple.Action action) async {
     var section = character.sections[action.actionType];
-    var createdAction = Maple.Action.fromJson(await dbService.addAction(action));
-    section?.actions[action.name] = createdAction;
+    var actions = await dbService.upsertActions([action]);
+
+    actions.map((a) {
+      var createdAction = Maple.Action.fromJson(a);
+      section?.actions[createdAction.id!] = createdAction;
+    });
   }
 
-  void saveResetTimes(String subject) async {
-    await dbService.updateUserResetTimes(subject);
+  void removeAction(Maple.Action action) async {
+    var section = character.sections[action.actionType];
+    await dbService.deleteAction(action.id!);
+    section?.actions.remove(action.id!);
+  }
+
+  void removeCharacter(Character character) async {
+    await dbService.deleteActions(character.id!);
+    await dbService.deleteCharacter(character.id!);
+    _tabController.animateTo(_tabController.index - 1);
+    _characters.removeWhere((c) => c.id == character.id);
+  }
+
+  void saveResetTimes(String? subject) async {
+    if (subject != null)
+      await dbService.updateUserResetTimes(subject);
   }
 
   void setTabController(TabController tabController) {
     _tabController = tabController;
   }
 
+  void changeCharacterOrder(int characterId, int newOrder) async {
+    await dbService.updateCharacterOrder(characterId, newOrder);
+  }
+
   void changeTab(int index) {
     _tabController.animateTo(index);
+  }
+
+  void clear() {
+    _characters.clear();
+    user = null;
+    profile = null;
+  }
+
+  void importFromOldSave(
+      OMT.MapleTracker oldMapleTrackerData, List<MapleClass> classes) async {
+    // Character saving
+    final characters = oldMapleTrackerData.characters
+        .mapIndexed(
+            (index, character) => Mapper.toCharacter(character, classes[index]))
+        .toList();
+
+    var createdCharacters = await dbService.upsertCharacters(characters);
+    var mappedCharacters =
+        createdCharacters.map((ch) => Character.fromJson(ch)).toList();
+
+    // Action saving
+    var actions = mappedCharacters
+        .mapIndexed((index, character) => Mapper.toActions(
+            oldMapleTrackerData.characters[index], character.id!))
+        .flattened
+        .toList();
+
+    await dbService.upsertActions(actions);
+
+    notifyListeners();
   }
 }

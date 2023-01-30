@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
   flutter_window_close
   menubar
+  uni_links_desktop
   url_launcher_windows
 )
 

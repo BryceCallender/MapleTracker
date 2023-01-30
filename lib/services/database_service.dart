@@ -19,25 +19,25 @@ class DatabaseService {
   Stream<List<dynamic>> listenToActions(int characterId) {
     return client
         .from("actions")
-        .stream(primaryKey: ['id'])
-        .eq("character_id", characterId);
+        .stream(primaryKey: ['id']).eq("character_id", characterId);
   }
 
   Future<Map<String, dynamic>> fetchUser(String subject) async {
     return await client.from("users").select().eq("id", subject).single();
   }
 
-  Future<void> addCharacter(Character character) async {
-    await client.from("characters").insert(character);
+  Future<Map<String, dynamic>> addCharacter(Character character) async {
+    return await client.from("characters").insert(character.toMap()).select();
   }
 
   Future<void> updateUserResetTimes(String subject) async {
-    final dailyReset = ResetHelper().calcResetTime();
-    final weeklyBossReset = ResetHelper().calcWeeklyResetTime();
+    final dailyReset = ResetHelper.calcResetTime();
+    final weeklyBossReset = ResetHelper.calcWeeklyResetTime();
     final weeklyQuestReset =
-        ResetHelper().calcWeeklyResetTime(resetDay: DateTime.monday);
+        ResetHelper.calcWeeklyResetTime(resetDay: DateTime.monday);
 
     await client.from("users").update({
+      'updated': DateTime.now().toUtc().toIso8601String(),
       'next_daily_reset':
           zeroOutTime(DateTime.now().toUtc().add(dailyReset)).toIso8601String(),
       'next_weekly_boss_reset':
@@ -61,7 +61,21 @@ class DatabaseService {
   }
 
   Future<Map<String, dynamic>> addAction(Action action) async {
-    return await client.from("actions").insert(action).select();
+    return await client.from("actions").insert(action.toMap()).select();
+  }
+
+  Future<List<dynamic>> upsertActions(List<Action> actions) async {
+    return await client
+        .from("actions")
+        .upsert(actions.map((a) => a.toMap()).toList())
+        .select();
+  }
+
+  Future<List<dynamic>> upsertCharacters(List<Character> characters) async {
+    return await client
+        .from("characters")
+        .upsert(characters.map((c) => c.toMap()).toList())
+        .select();
   }
 
   Future<void> updateAction(Action action) async {
@@ -73,6 +87,12 @@ class DatabaseService {
     }).match({'id': action.id});
   }
 
+  Future<void> updateCharacterOrder(int characterId, int order) async {
+    await client.from("characters").update({
+      'order': order
+    }).match({'id': characterId});
+  }
+
   Future<void> deleteCharacter(int characterId) async {
     await client.from("characters").delete().match({'id': characterId});
   }
@@ -81,11 +101,13 @@ class DatabaseService {
     await client.from("actions").delete().match({'id': actionId});
   }
 
+  Future<void> deleteActions(int characterId) async {
+    await client.from("actions").delete().match({'character_id': characterId});
+  }
+
   Future<void> resetActions(String subject, int actionType) async {
-    await client.rpc("clear_actions_of_type", params: {
-      'subject': subject,
-      'action_type_id': actionType
-    });
+    await client.rpc("clear_actions_of_type",
+        params: {'subject': subject, 'action_type_id': actionType});
   }
 
   Future<Map<String, dynamic>> getProfile(String userId) async {

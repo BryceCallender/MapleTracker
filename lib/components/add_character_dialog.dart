@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:maple_daily_tracker/components/character_action_copy.dart';
+import 'package:maple_daily_tracker/extensions/snackbar_extensions.dart';
+import 'package:maple_daily_tracker/extensions/enum_extensions.dart';
 import 'package:maple_daily_tracker/models/action-section.dart';
+import 'package:maple_daily_tracker/models/action-type.dart';
+import 'package:maple_daily_tracker/models/character.dart';
+import 'package:maple_daily_tracker/models/maple-class.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
-
-import '../models/action-type.dart';
-import '../models/character.dart';
 
 class AddCharacterDialog extends StatefulWidget {
   const AddCharacterDialog({Key? key}) : super(key: key);
@@ -16,7 +19,21 @@ class AddCharacterDialog extends StatefulWidget {
 
 class _AddCharacterDialog extends State<AddCharacterDialog> {
   TextEditingController _nameController = TextEditingController();
+  List<MapleClass> sortedClassTypes = [];
+  MapleClass classType = MapleClass.None;
   int _currentStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    sortedClassTypes = List.from(MapleClass.values);
+    sortedClassTypes.sort((MapleClass a, MapleClass b) {
+      return a.name.compareTo(b.name);
+    });
+
+    sortedClassTypes.remove(MapleClass.None);
+    sortedClassTypes.insert(0, MapleClass.None);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +46,7 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
         height: height,
         width: width,
         child: Stepper(
+          type: StepperType.horizontal,
           currentStep: _currentStep,
           onStepCancel: () {
             if (_currentStep > 0) {
@@ -38,7 +56,7 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
             }
           },
           onStepContinue: () {
-            if (_currentStep <= 0) {
+            if (_currentStep < 2) {
               setState(() {
                 _currentStep += 1;
               });
@@ -52,6 +70,7 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
           steps: [
             Step(
               title: const Text('Name the character'),
+              state: StepState.editing,
               content: Container(
                 padding: EdgeInsets.all(8.0),
                 alignment: Alignment.centerLeft,
@@ -63,13 +82,42 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
               isActive: _currentStep >= 0,
             ),
             Step(
+                title: const Text('Pick the class'),
+                content: Container(
+                  padding: EdgeInsets.all(8.0),
+                  alignment: Alignment.centerLeft,
+                  child: DropdownButton<MapleClass>(
+                    value: classType,
+                    items: sortedClassTypes
+                        .map<DropdownMenuItem<MapleClass>>((value) {
+                      return DropdownMenuItem(
+                        value: value,
+                        child: Text(value.name),
+                      );
+                    }).toList(),
+                    onChanged: (MapleClass? pickedClass) {
+                      setState(() {
+                        classType = pickedClass!;
+                      });
+                    },
+                  ),
+                ),
+              isActive: _currentStep >= 1,
+            ),
+            Step(
               title: const Text('Details'),
               content: Container(
                 padding: EdgeInsets.all(8.0),
                 alignment: Alignment.centerLeft,
-                child: Container(),
+                child: Container(
+                  child: Column(
+                    children: [
+                      CharacterActionCopy()
+                    ],
+                  ),
+                ),
               ),
-              isActive: _currentStep >= 1,
+              isActive: _currentStep >= 2,
             ),
           ],
         ),
@@ -81,19 +129,29 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
           },
           child: const Text('Cancel'),
         ),
-        TextButton(
+        FilledButton(
           onPressed: () {
-            // var tracker = Provider.of<TrackerModel>(context, listen: false);
-            // tracker.add(
-            //   Character(
-            //     name: _nameController.text.trim(),
-            //     sections: {
-            //       ActionType.dailies: ActionSection.empty(ActionType.dailies),
-            //       ActionType.weeklyBoss: ActionSection.empty(ActionType.weeklyBoss),
-            //       ActionType.weeklyQuest: ActionSection.empty(ActionType.weeklyQuest)
-            //     }
-            //   ),
-            // );
+            var tracker = Provider.of<TrackerModel>(context, listen: false);
+            tracker.addCharacter(
+              Character(
+                  id: null,
+                  classId: classType,
+                  subjectId: tracker.user!.userId,
+                  name: _nameController.text.trim(),
+                  order: tracker.characters.length,
+                  createdOn: DateTime.now().toUtc(),
+                  hiddenSections: [],
+                  sections: {
+                    ActionType.dailies: ActionSection.empty(ActionType.dailies),
+                    ActionType.weeklyBoss:
+                        ActionSection.empty(ActionType.weeklyBoss),
+                    ActionType.weeklyQuest:
+                        ActionSection.empty(ActionType.weeklyQuest)
+                  },
+              ),
+            );
+            context.showSnackBar(
+                message: 'Added character ${_nameController.text}');
             Navigator.of(context).pop();
           },
           child: const Text('Add'),

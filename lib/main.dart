@@ -1,57 +1,37 @@
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:context_menus/context_menus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:maple_daily_tracker/components/locked_popup_item.dart';
+import 'package:maple_daily_tracker/extensions/color_extensions.dart';
 import 'package:maple_daily_tracker/screens/home_screen.dart';
 import 'package:maple_daily_tracker/screens/login_screen.dart';
 import 'package:maple_daily_tracker/services/authentication_service.dart';
 import 'package:maple_daily_tracker/services/database_service.dart';
-import 'package:menubar/menubar.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:mime/mime.dart';
+import 'package:uni_links_desktop/uni_links_desktop.dart';
 
 import 'constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb) {
-    final menu = <NativeSubmenu>[
-      NativeSubmenu(
-        label: 'File',
-        children: [
-          NativeMenuItem(
-            label: 'Exit',
-            onSelected: () => FlutterWindowClose.closeWindow(),
-          ),
-        ],
-      ),
-      NativeSubmenu(label: 'Help', children: [
-        NativeMenuItem(
-          label: 'About',
-          onSelected: () => {},
-        ),
-      ]),
-    ];
-    setApplicationMenu(menu);
-  }
-
   await Supabase.initialize(
     url: SUPABASE_URL,
     anonKey: SUPABASE_ANNON_KEY,
   );
 
-  FlutterWindowClose.setWindowShouldCloseHandler(() async {
-    return true;
-  });
+  if (Platform.isWindows) {
+    registerProtocol('io.mapledailytracker');
+  }
 
   List<SingleChildWidget> providers = [
     ChangeNotifierProvider<TrackerModel>(
@@ -76,7 +56,7 @@ void main() async {
   );
 
   doWhenWindowReady(() {
-    final initialSize = Size(1000, 600);
+    final initialSize = Size(1000, 650);
     appWindow.minSize = initialSize;
     appWindow.size = initialSize;
     appWindow.title = 'Maple Tracker';
@@ -115,13 +95,19 @@ class MyApp extends StatelessWidget {
             foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
           ),
         ),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: MaterialStateProperty.all<Color>(accentColor),
+          checkColor: MaterialStateProperty.all<Color>(accentColor.toLuminanceColor()),
+          side: BorderSide(
+            width: 2.0,
+            color: Colors.white70
+          )
+        )
       ),
       themeMode: ThemeMode.dark,
-      // initialRoute: 'login',
-      // routes: {
-      //   'login': (_) => LoginScreen()
-      // },
-      home: const MyHomePage(title: 'Maple Daily Tracker'),
+      home: ContextMenuOverlay(
+        child: const MyHomePage(title: 'Maple Daily Tracker'),
+      ),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -146,6 +132,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     getProfile();
+
+    FlutterWindowClose.setWindowShouldCloseHandler(() async {
+      print('closing and saving reset times...');
+      context.read<TrackerModel>().saveResetTimes(supabase.auth.currentUser?.id);
+      return true;
+    });
   }
 
   @override
@@ -159,19 +151,37 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context, authState, child) {
               if (supabase.auth.currentUser == null) return Container();
 
+              final user = authState?.session?.user;
+              final profile = context.watch<TrackerModel>().profile;
+
+              String username = profile?.username ??
+                  user?.userMetadata?["username"] ??
+                  "Account";
+
+              String? avatar_url = profile?.avatarUrl ??
+                  user?.userMetadata?['avatar_url'] ??
+                  _avatarUrl;
+
+              final email =
+                  user?.email ?? supabase.auth.currentUser?.email ?? '';
+
               return PopupMenuButton(
                 position: PopupMenuPosition.under,
-                icon: (_avatarUrl != null)
+                icon: (avatar_url != null)
                     ? CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: kAvatarSize + 1,
                         child: CircleAvatar(
-                          backgroundImage: NetworkImage(_avatarUrl!),
+                          radius: kAvatarSize,
+                          backgroundImage: NetworkImage(avatar_url),
                         ),
                       )
                     : CircleAvatar(
                         backgroundColor: Colors.tealAccent,
-                        child: const Icon(Icons.person_rounded),
+                        child: const Icon(
+                          Icons.person_rounded,
+                          color: Colors.black,
+                        ),
                       ),
                 itemBuilder: (context) {
                   return [
@@ -181,30 +191,33 @@ class _MyHomePageState extends State<MyHomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Account",
+                            username,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           SizedBox(
                             height: 4.0,
                           ),
-                          Text(supabase.auth.currentUser?.email ?? "")
+                          Text(email)
                         ],
                       ),
                     ),
                     LockedPopupItem(
                       child: Center(
-                        child: (_avatarUrl != null)
+                        child: (avatar_url != null)
                             ? CircleAvatar(
                                 backgroundColor: Colors.white,
                                 radius: kAvatarSizeLarge + 1,
                                 child: CircleAvatar(
                                   radius: kAvatarSizeLarge,
-                                  backgroundImage: NetworkImage(_avatarUrl!),
+                                  backgroundImage: NetworkImage(avatar_url),
                                 ),
                               )
                             : CircleAvatar(
                                 backgroundColor: Colors.tealAccent,
-                                child: const Icon(Icons.person_rounded),
+                                child: const Icon(
+                                  Icons.person_rounded,
+                                  color: Colors.black,
+                                ),
                               ),
                       ),
                       onTap: () async {
@@ -213,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     LockedPopupItem(
                       child: Center(
-                        child: TextButton(
+                        child: FilledButton(
                           onPressed: () async {
                             _handleImageUpload();
                           },
@@ -227,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         title: Text("Logout"),
                       ),
                       onTap: () async {
+                        context.read<TrackerModel>().clear();
                         await context.read<AuthenticationService>().signOut();
                       },
                     )
@@ -241,7 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<Null> _handleImageUpload() async {
+  Future<void> _handleImageUpload() async {
     var result = await FilePicker.platform
         .pickFiles(withData: true, type: FileType.image);
 
@@ -276,10 +290,9 @@ class _MyHomePageState extends State<MyHomePage> {
       final data = await dbService.getProfile(userId);
 
       setState(() {
-        _avatarUrl = (data['avatar_url'] ?? '') as String;
+        _avatarUrl = data['avatar_url'] as String?;
       });
     } on PostgrestException catch (error) {
-      print(error);
     } catch (error) {}
   }
 }
@@ -289,6 +302,8 @@ class AuthenticationWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthState?>();
+
     if (supabase.auth.currentUser != null) {
       return HomeScreen();
     }

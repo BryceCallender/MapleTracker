@@ -30,9 +30,6 @@ class CustomLabeledCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-    final color =
-        (activeColor ?? themeData.colorScheme.secondary).toLuminanceColor();
-
     return InkWell(
       onTap: _onChanged,
       child: Row(
@@ -44,13 +41,14 @@ class CustomLabeledCheckbox extends StatelessWidget {
             tristate: tristate,
             value: value,
             onChanged: (val) => _onChanged(),
-            activeColor: themeData.colorScheme.secondary,
-            checkColor: color,
           ),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: themeData.textTheme.subtitle1,
+          Expanded(
+            child: Text(
+              label,
+              style: themeData.textTheme.titleMedium,
+              overflow: TextOverflow.ellipsis,
+            ),
           )
         ],
       ),

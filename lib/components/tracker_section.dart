@@ -1,15 +1,18 @@
+import 'dart:convert';
+import 'dart:ffi';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:maple_daily_tracker/components/add_character_dialog.dart';
 import 'package:maple_daily_tracker/components/character_actions.dart';
 import 'package:maple_daily_tracker/components/confirmation_dialog.dart';
-import 'package:maple_daily_tracker/components/section.dart';
-import 'package:maple_daily_tracker/constants.dart';
+import 'package:maple_daily_tracker/extensions/snackbar_extensions.dart';
+import 'package:maple_daily_tracker/external/reorderable_tabbar.dart';
+import 'package:maple_daily_tracker/helpers/image_helper.dart';
+import 'package:maple_daily_tracker/models/character.dart';
+import 'package:maple_daily_tracker/models/old-maple-tracker.dart' as OMT;
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
-
-import '../models/action-type.dart';
-import '../models/character.dart';
-import 'add_character_dialog.dart';
 
 class TrackerSection extends StatefulWidget {
   const TrackerSection({Key? key, required this.characters}) : super(key: key);
@@ -21,7 +24,7 @@ class TrackerSection extends StatefulWidget {
 }
 
 class _TrackerSectionState extends State<TrackerSection>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -43,6 +46,13 @@ class _TrackerSectionState extends State<TrackerSection>
   @override
   Widget build(BuildContext context) {
     var themeData = Theme.of(context);
+    var tracker = Provider.of<TrackerModel>(context);
+    var characters = context.watch<TrackerModel>().characters;
+    _tabController = TabController(
+        initialIndex: _tabController.index,
+        length: characters.length,
+        vsync: this);
+    tracker.setTabController(_tabController);
 
     return Scaffold(
       appBar: AppBar(
@@ -52,11 +62,23 @@ class _TrackerSectionState extends State<TrackerSection>
           children: [
             Expanded(
               child: SingleChildScrollView(
-                child: TabBar(
+                child: ReorderableTabBar(
                   controller: _tabController,
+                  indicator: UnderlineTabIndicator(
+                    borderSide: BorderSide(
+                      width: 5,
+                      color: themeData.colorScheme.secondary,
+                    ),
+                  ),
                   indicatorColor: themeData.colorScheme.secondary,
                   isScrollable: true,
                   tabs: _buildTabs(widget.characters),
+                  tabBorderRadius: BorderRadius.circular(5.0),
+                  onReorder: (oldIndex, newIndex) {
+                    print('$oldIndex:$newIndex');
+                    // final tabCharacter = characters[oldIndex];
+                    // tracker.changeCharacterOrder(tabCharacter.id!, newIndex);
+                  }
                 ),
               ),
             ),
@@ -71,56 +93,67 @@ class _TrackerSectionState extends State<TrackerSection>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: widget.characters
-            .map(
-              (character) => SingleChildScrollView(
-                child: CharacterActions(
-                  characterId: character.id,
-                  sections: character.sections,
-                ),
-              ),
+      body: widget.characters.isEmpty
+          ? SizedBox.expand(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                          text: "Welcome to the Maple Tracker!\n",
+                          children: [
+                            TextSpan(
+                                text: "It seems you have no characters!\n"),
+                            TextSpan(text: "")
+                          ]),
+                    )
+                  ]),
             )
-            .toList(),
-      ),
+          : TabBarView(
+              controller: _tabController,
+              children: widget.characters
+                  .map(
+                    (character) => SingleChildScrollView(
+                      child: CharacterActions(
+                        characterId: character.id!,
+                        sections: character.sections,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
     );
   }
 
   List<Widget> _buildTabs(List<Character>? characters) {
     var tabs = <Widget>[];
 
-    // for (int i = 0; i < 5; i++) {
-    //   characters?.add(characters[0]);
-    // }
-
-    for (var character in characters ?? []) {
+    for (var character in characters ?? <Character>[]) {
+      final classImage = ImageHelper.classToImage(character.classId);
       tabs.add(Tab(
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (classImage.isNotEmpty) ...[
+              Image.asset(classImage),
+              const SizedBox(
+                width: 8.0,
+              ),
+            ],
             Text(character.name),
             const SizedBox(
               width: 8.0,
             ),
             IconButton(
               onPressed: () {
-                final snackBar = SnackBar(
-                  content: Text('Removed ${character.name}'),
-                  action: SnackBarAction(
-                    label: 'Undo',
-                    onPressed: () {
-                      //add char
-                    },
-                  ),
-                );
-
                 showDialog<void>(
                   context: context,
                   builder: (context) => ConfirmationDialog(
                     onAccept: () {
                       //remove char
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      context.read<TrackerModel>().removeCharacter(character);
+                      context.showSnackBar(
+                          message: 'Removed ${character.name}');
                     },
                     onReject: () {},
                     removalText: character.name,

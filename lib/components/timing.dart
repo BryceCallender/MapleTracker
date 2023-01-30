@@ -26,6 +26,12 @@ class _TimingState extends State<Timing> {
   Duration? weeklyQuestReset;
 
   @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     resetFromOpen = false;
@@ -37,10 +43,10 @@ class _TimingState extends State<Timing> {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         utcNow = DateTime.now().toUtc();
-        dailyReset = ResetHelper().calcResetTime();
-        weeklyBossReset = ResetHelper().calcWeeklyResetTime();
+        dailyReset = ResetHelper.calcResetTime();
+        weeklyBossReset = ResetHelper.calcWeeklyResetTime();
         weeklyQuestReset =
-            ResetHelper().calcWeeklyResetTime(resetDay: DateTime.monday);
+            ResetHelper.calcWeeklyResetTime(resetDay: DateTime.monday);
 
         if (tracker.user == null)
           return;

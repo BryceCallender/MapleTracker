@@ -42,7 +42,7 @@ class Section extends StatelessWidget {
                 ),
                 Text(
                   title,
-                  style: textTheme.bodyText1,
+                  style: textTheme.bodyLarge,
                 ),
               ],
             ),

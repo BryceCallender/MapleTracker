@@ -38,16 +38,24 @@ class Action {
         actionType = ActionType.values[json['action_type']],
         characterId = json['character_id'];
 
-  Map<String, dynamic> toMap() => {
-    'id': id,
-    'name': name,
-    'order': order,
-    'done': done,
-    'is_temp': isTemp,
-    'removal_time': removalTime?.toIso8601String(),
-    'created': createdOn.toIso8601String(),
-    'updated': DateTime.now().toUtc().toIso8601String(),
-    'action_type': actionType.index,
-    'character_id': characterId
-  };
+  Map<String, dynamic> toMap() {
+    var data = {
+      'id': id,
+      'name': name,
+      'order': order,
+      'done': done,
+      'is_temp': isTemp,
+      'removal_time': removalTime?.toIso8601String(),
+      'created': createdOn.toIso8601String(),
+      'updated': DateTime.now().toUtc().toIso8601String(),
+      'action_type': actionType.index,
+      'character_id': characterId
+    };
+
+    if (id == null) {
+      data.remove('id');
+    }
+
+    return data;
+  }
 }

@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 extension DateTimeUtils on DateTime {
   DateTime copyWith({
     int? year,
@@ -32,5 +34,13 @@ extension DateTimeUtils on DateTime {
         0,
         0
     );
+  }
+
+  static DateTime? parseQtTime(String qtTime) {
+    if (qtTime.isEmpty) {
+      return null;
+    }
+
+    return DateFormat("EEE MMM d HH:mm:ss y").parse(qtTime);
   }
 }

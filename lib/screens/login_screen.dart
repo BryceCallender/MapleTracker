@@ -49,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         )
                       else
                         SignUpScreen(
+                          onSignUpSuccess: _onSignUpSuccess,
                           onSignIn: _onSignInClicked,
                         )
                     ]
@@ -67,6 +68,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onSignInClicked() {
+    _updateAction(SupaAuthAction.signIn);
+  }
+
+  void _onSignUpSuccess() {
     _updateAction(SupaAuthAction.signIn);
   }
 

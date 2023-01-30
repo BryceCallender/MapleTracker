@@ -4,7 +4,7 @@ import 'package:maple_daily_tracker/models/action.dart';
 class ActionSection {
   bool isActive;
   ActionType actionType;
-  Map<String, Action> actions;
+  Map<int, Action> actions;
 
   List<Action> get actionList => actions.values.toList();
 
@@ -19,7 +19,7 @@ class ActionSection {
   }
 
   void addAction(Action action) {
-    actions[action.name] = action;
+    actions[action.id!] = action;
   }
 
   double percentage() {
