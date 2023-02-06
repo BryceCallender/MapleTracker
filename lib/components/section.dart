@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/checkbox_section.dart';
+import 'package:maple_daily_tracker/components/reorder_action_dialog.dart';
 import 'package:maple_daily_tracker/models/action-section.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
-class Section extends StatelessWidget {
+class Section extends StatefulWidget {
   const Section({Key? key, required this.title, required this.characterId, required this.section})
       : super(key: key);
 
@@ -13,6 +14,11 @@ class Section extends StatelessWidget {
   final int characterId;
   final ActionSection section;
 
+  @override
+  State<Section> createState() => _SectionState();
+}
+
+class _SectionState extends State<Section> {
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
@@ -34,33 +40,39 @@ class Section extends StatelessWidget {
               children: [
                 IconButton(
                     onPressed: () {
-                      tracker.toggleSection(characterId, section.actionType);
+                      tracker.toggleSection(widget.characterId, widget.section.actionType);
                     },
-                    icon: section.isActive
+                    icon: widget.section.isActive
                         ? Icon(CupertinoIcons.eye_fill)
                         : Icon(CupertinoIcons.eye_slash_fill),
                 ),
                 Text(
-                  title,
+                  widget.title,
                   style: textTheme.bodyLarge,
                 ),
+                Spacer(),
+                if (widget.section.actionList.isNotEmpty)
+                  IconButton(
+                    onPressed: () => _showReorderActionDialog(context),
+                    icon: Icon(CupertinoIcons.list_number),
+                  ),
               ],
             ),
             Visibility(
-              visible: section.isActive,
+              visible: widget.section.isActive,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CheckboxSection(
                     label: "Unfinished",
-                    type: section.actionType,
+                    type: widget.section.actionType,
                     canAdd: true,
-                    items: section.actionList.where((a) => !a.done).toList(),
+                    items: widget.section.actionList.where((a) => !a.done).toList(),
                   ),
                   CheckboxSection(
                     label: "Finished",
-                    type: section.actionType,
-                    items: section.actionList.where((a) => a.done).toList(),
+                    type: widget.section.actionType,
+                    items: widget.section.actionList.where((a) => a.done).toList(),
                   ),
                 ],
               ),
@@ -68,6 +80,18 @@ class Section extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showReorderActionDialog(
+      BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return ReorderActionDialog(
+          actions: widget.section.actionList,
+        );
+      },
     );
   }
 }

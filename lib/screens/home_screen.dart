@@ -29,10 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final subject = supabase.auth.currentUser!.id;
     tracker.fetchUserInfo(subject);
     _characters = tracker.listenToCharacters(subject);
-
-    if (kIsWeb) {
-      return;
-    }
   }
 
   @override

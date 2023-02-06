@@ -6,6 +6,15 @@ import 'package:flutter/material.dart';
 /// //////////////////////////////////////////////////////////////
 /// Styles - Contains the design system for the entire app.
 /// Includes paddings, text styles, timings etc. Does not include colors, check [AppTheme] file for that.
+
+class Times {
+  static const Duration fastest = Duration(milliseconds: 150);
+  static const fast = Duration(milliseconds: 250);
+  static const medium = Duration(milliseconds: 350);
+  static const slow = Duration(milliseconds: 700);
+  static const slower = Duration(milliseconds: 1000);
+}
+
 class Sizes {
   static double hitScale = 1;
   static double get hit => 40 * hitScale;

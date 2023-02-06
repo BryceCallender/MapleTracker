@@ -11,7 +11,8 @@ import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
 class AddActionDialog extends StatefulWidget {
-  const AddActionDialog({Key? key, this.action, required this.actions, required this.type})
+  const AddActionDialog(
+      {Key? key, this.action, required this.actions, required this.type})
       : super(key: key);
 
   final Maple.Action? action;
@@ -62,7 +63,9 @@ class _AddActionDialogState extends State<AddActionDialog> {
                       return 'Please enter a name';
                     }
 
-                    if (widget.actions.where((a) => a.name == value).isNotEmpty) {
+                    if (widget.actions
+                        .where((a) => a.name == value)
+                        .isNotEmpty) {
                       return 'Name is already used';
                     }
 
@@ -82,15 +85,17 @@ class _AddActionDialogState extends State<AddActionDialog> {
                 SizedBox(
                   height: 8.0,
                 ),
-                if (isTemp ?? false) DateTimePicker(
-                  onDateSelected: (dateTime) {
-                    removalDateTime = dateTime;
-                  },
-                  onTimeSelected: (timeOfDay) {
-                    var dateTime = removalDateTime ?? DateTime.now();
-                    removalDateTime = dateTime.copyWith(hour: timeOfDay.hour, minute: timeOfDay.minute);
-                  },
-                ).animate().fadeIn()
+                if (isTemp ?? false)
+                  DateTimePicker(
+                    onDateSelected: (dateTime) {
+                      removalDateTime = dateTime;
+                    },
+                    onTimeSelected: (timeOfDay) {
+                      var dateTime = removalDateTime ?? DateTime.now();
+                      removalDateTime = dateTime.copyWith(
+                          hour: timeOfDay.hour, minute: timeOfDay.minute);
+                    },
+                  ).animate().fadeIn()
               ],
             ),
           ),
@@ -107,24 +112,28 @@ class _AddActionDialogState extends State<AddActionDialog> {
               if (_formKey.currentState!.validate()) {
                 var tracker = Provider.of<TrackerModel>(context, listen: false);
                 final action = widget.action;
-                tracker.upsertAction(
-                  Maple.Action(
-                    id: action?.id ?? null,
-                    actionType: widget.type,
-                    name: _actionName.text.trim(),
-                    done: action?.done ?? false,
-                    order: action?.order ?? widget.actions.length,
-                    createdOn: action?.createdOn ?? DateTime.now().toUtc(),
-                    isTemp: isTemp ?? action?.isTemp,
-                    removalTime: removalDateTime ?? action?.removalTime,
-                    characterId: action?.characterId ?? tracker.character.id!,
-                  ),
+                tracker.upsertActions(
+                  [
+                    Maple.Action(
+                      id: action?.id ?? null,
+                      actionType: widget.type,
+                      name: _actionName.text.trim(),
+                      done: action?.done ?? false,
+                      order: action?.order ?? widget.actions.length,
+                      createdOn: action?.createdOn ?? DateTime.now().toUtc(),
+                      isTemp: isTemp ?? action?.isTemp,
+                      removalTime: removalDateTime ?? action?.removalTime,
+                      characterId: action?.characterId ?? tracker.character.id!,
+                    ),
+                  ],
                 );
 
                 if (action != null) {
                   context.showSnackBar(message: 'Edited ${action.name}');
                 } else {
-                  context.showSnackBar(message: 'Added ${_actionName.text} to ${widget.type.name}');
+                  context.showSnackBar(
+                      message:
+                          'Added ${_actionName.text} to ${widget.type.name}');
                 }
 
                 Navigator.of(context).pop();

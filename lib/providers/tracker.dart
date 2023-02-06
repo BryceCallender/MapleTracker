@@ -45,7 +45,6 @@ class TrackerModel extends ChangeNotifier {
 
   Stream<List<Character>> listenToCharacters(String subject) {
     return dbService.listenToCharacters().map((maps) {
-      print(maps);
       return maps.map((ch) {
         final character = Character.fromJson(ch);
         final existingCharacter = _characters
@@ -106,11 +105,12 @@ class TrackerModel extends ChangeNotifier {
     return await dbService.addCharacter(character);
   }
 
-  void upsertAction(Maple.Action action) async {
-    var section = character.sections[action.actionType];
-    var actions = await dbService.upsertActions([action]);
+  void upsertActions(List<Maple.Action> actions) async {
+    var actionType = actions.first.actionType;
+    var section = character.sections[actionType];
+    var createdActions = await dbService.upsertActions(actions);
 
-    actions.map((a) {
+    createdActions.map((a) {
       var createdAction = Maple.Action.fromJson(a);
       section?.actions[createdAction.id!] = createdAction;
     });
@@ -138,8 +138,8 @@ class TrackerModel extends ChangeNotifier {
     _tabController = tabController;
   }
 
-  void changeCharacterOrder(int characterId, int newOrder) async {
-    await dbService.updateCharacterOrder(characterId, newOrder);
+  void changeCharacterOrder(int characterId, int otherCharacterId, int oldOrder, int newOrder) async {
+    await dbService.updateCharacterOrder(characterId, otherCharacterId);
   }
 
   void changeTab(int index) {

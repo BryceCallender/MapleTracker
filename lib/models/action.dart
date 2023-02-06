@@ -1,4 +1,3 @@
-import 'package:enum_to_string/enum_to_string.dart';
 import 'package:maple_daily_tracker/models/action-type.dart';
 
 class Action {
@@ -13,18 +12,17 @@ class Action {
   final ActionType actionType;
   final int characterId;
 
-  Action({
-    required this.id,
-    required this.name,
-    required this.order,
-    required this.done,
-    required this.createdOn,
-    required this.actionType,
-    required this.characterId,
-    this.updatedOn,
-    this.isTemp,
-    this.removalTime
-  });
+  Action(
+      {required this.id,
+      required this.name,
+      required this.order,
+      required this.done,
+      required this.createdOn,
+      required this.actionType,
+      required this.characterId,
+      this.updatedOn,
+      this.isTemp,
+      this.removalTime});
 
   Action.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -32,9 +30,12 @@ class Action {
         order = json['order'],
         done = json['done'],
         isTemp = json['is_temp'],
-        removalTime = json['removal_time'] == null ? null : DateTime.parse(json['removal_time']),
+        removalTime = json['removal_time'] == null
+            ? null
+            : DateTime.parse(json['removal_time']),
         createdOn = DateTime.parse(json['created']),
-        updatedOn = json['updated'] == null ? null : DateTime.parse(json['updated']),
+        updatedOn =
+            json['updated'] == null ? null : DateTime.parse(json['updated']),
         actionType = ActionType.values[json['action_type']],
         characterId = json['character_id'];
 
@@ -57,5 +58,19 @@ class Action {
     }
 
     return data;
+  }
+
+  Action copyWith({int? order}) {
+    return Action(
+        id: id,
+        name: name,
+        done: done,
+        order: order ?? this.order,
+        isTemp: isTemp,
+        removalTime: removalTime,
+        createdOn: createdOn,
+        updatedOn: updatedOn,
+        actionType: actionType,
+        characterId: characterId);
   }
 }

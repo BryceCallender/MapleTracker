@@ -92,7 +92,7 @@ class CheckboxSection extends StatelessWidget {
                                 action: SnackBarAction(
                                   label: 'Undo',
                                   onPressed: () {
-                                    tracker.upsertAction(item);
+                                    tracker.upsertActions([item]);
                                   },
                                 ),
                               );

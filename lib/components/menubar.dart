@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maple_daily_tracker/components/preferences_dialog.dart';
 import 'package:maple_daily_tracker/models/old-maple-tracker.dart' as OMT;
 import 'package:maple_daily_tracker/components/import_characters_dialog.dart';
 
@@ -86,6 +87,15 @@ class _MenubarState extends State<Menubar> {
                   PlatformProvidedMenuItemType.about))
                 const PlatformProvidedMenuItem(
                     type: PlatformProvidedMenuItemType.about),
+
+              PlatformMenuItem(
+                label: 'Settings',
+                onSelected: () async {
+                  _showSettingsDialog(context);
+                },
+                shortcut: const SingleActivator(LogicalKeyboardKey.comma, meta: true)
+              ),
+
               if (PlatformProvidedMenuItem.hasMenu(
                   PlatformProvidedMenuItemType.quit))
                 const PlatformProvidedMenuItem(
@@ -94,7 +104,14 @@ class _MenubarState extends State<Menubar> {
           ),
           PlatformMenu(
             label: "File",
-            menus: [PlatformMenuItem(label: 'Import', onSelected: importData, shortcut: const SingleActivator(LogicalKeyboardKey.keyO, meta: true))],
+            menus: [
+              PlatformMenuItem(
+                label: 'Import',
+                onSelected: importData,
+                shortcut:
+                    const SingleActivator(LogicalKeyboardKey.keyO, meta: true),
+              )
+            ],
           ),
         ],
       );
@@ -164,6 +181,15 @@ class _MenubarState extends State<Menubar> {
         return ImportCharactersDialog(
           tracker: tracker,
         );
+      },
+    );
+  }
+
+  Future<void> _showSettingsDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return PreferencesDialog();
       },
     );
   }

@@ -87,10 +87,12 @@ class DatabaseService {
     }).match({'id': action.id});
   }
 
-  Future<void> updateCharacterOrder(int characterId, int order) async {
-    await client.from("characters").update({
-      'order': order
-    }).match({'id': characterId});
+  Future<void> updateCharacterOrder(
+      int characterId, int otherCharacterId) async {
+    await client.rpc("swap_order", params: {
+      'character_id': characterId,
+      'other_character_id': otherCharacterId
+    });
   }
 
   Future<void> deleteCharacter(int characterId) async {

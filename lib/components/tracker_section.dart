@@ -1,18 +1,15 @@
-import 'dart:convert';
-import 'dart:ffi';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/add_character_dialog.dart';
 import 'package:maple_daily_tracker/components/character_actions.dart';
 import 'package:maple_daily_tracker/components/confirmation_dialog.dart';
 import 'package:maple_daily_tracker/extensions/snackbar_extensions.dart';
-import 'package:maple_daily_tracker/external/reorderable_tabbar.dart';
+import 'package:reorderable_tabbar/reorderable_tabbar.dart';
 import 'package:maple_daily_tracker/helpers/image_helper.dart';
 import 'package:maple_daily_tracker/models/character.dart';
 import 'package:maple_daily_tracker/models/old-maple-tracker.dart' as OMT;
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 
 class TrackerSection extends StatefulWidget {
   const TrackerSection({Key? key, required this.characters}) : super(key: key);
@@ -45,13 +42,13 @@ class _TrackerSectionState extends State<TrackerSection>
 
   @override
   Widget build(BuildContext context) {
-    var themeData = Theme.of(context);
     var tracker = Provider.of<TrackerModel>(context);
     var characters = context.watch<TrackerModel>().characters;
     _tabController = TabController(
         initialIndex: _tabController.index,
         length: characters.length,
-        vsync: this);
+        vsync: this,
+    );
     tracker.setTabController(_tabController);
 
     return Scaffold(
@@ -63,23 +60,19 @@ class _TrackerSectionState extends State<TrackerSection>
             Expanded(
               child: SingleChildScrollView(
                 child: ReorderableTabBar(
-                  controller: _tabController,
-                  indicator: UnderlineTabIndicator(
-                    borderSide: BorderSide(
-                      width: 5,
-                      color: themeData.colorScheme.secondary,
-                    ),
-                  ),
-                  indicatorColor: themeData.colorScheme.secondary,
-                  isScrollable: true,
-                  tabs: _buildTabs(widget.characters),
-                  tabBorderRadius: BorderRadius.circular(5.0),
-                  onReorder: (oldIndex, newIndex) {
-                    print('$oldIndex:$newIndex');
-                    // final tabCharacter = characters[oldIndex];
-                    // tracker.changeCharacterOrder(tabCharacter.id!, newIndex);
-                  }
-                ),
+                    controller: _tabController,
+                    isScrollable: true,
+                    tabs: _buildTabs(widget.characters),
+                    tabBorderRadius: BorderRadius.circular(5.0),
+                    onReorder: (oldIndex, newIndex) {
+                      final tabCharacter = characters[oldIndex];
+                      final swappingChar = characters[newIndex];
+                      setState(() {
+                        widget.characters.swap(oldIndex, newIndex);
+                        tracker.changeCharacterOrder(tabCharacter.id!,
+                            swappingChar.id!, oldIndex, newIndex);
+                      });
+                    }),
               ),
             ),
             Container(
