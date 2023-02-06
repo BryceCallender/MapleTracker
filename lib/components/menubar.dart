@@ -87,15 +87,13 @@ class _MenubarState extends State<Menubar> {
                   PlatformProvidedMenuItemType.about))
                 const PlatformProvidedMenuItem(
                     type: PlatformProvidedMenuItemType.about),
-
               PlatformMenuItem(
-                label: 'Settings',
-                onSelected: () async {
-                  _showSettingsDialog(context);
-                },
-                shortcut: const SingleActivator(LogicalKeyboardKey.comma, meta: true)
-              ),
-
+                  label: 'Settings',
+                  onSelected: () async {
+                    _showSettingsDialog(context);
+                  },
+                  shortcut: const SingleActivator(LogicalKeyboardKey.comma,
+                      meta: true)),
               if (PlatformProvidedMenuItem.hasMenu(
                   PlatformProvidedMenuItemType.quit))
                 const PlatformProvidedMenuItem(
@@ -125,17 +123,22 @@ class _MenubarState extends State<Menubar> {
   List<MenuEntry> _getMenus() {
     final List<MenuEntry> result = <MenuEntry>[
       MenuEntry(
-        label: 'Menu Demo',
+        label: 'File',
         menuChildren: <MenuEntry>[
           MenuEntry(label: 'About', onPressed: about),
           MenuEntry(
-            label: '',
-            onPressed: () {
-              setState(() {});
-            },
+            label: 'Import',
+            onPressed: importData,
             shortcut:
-                const SingleActivator(LogicalKeyboardKey.keyS, control: true),
+                const SingleActivator(LogicalKeyboardKey.keyO, control: true),
           ),
+          MenuEntry(
+            label: 'Settings',
+            onPressed: () => _showSettingsDialog(context),
+            // shortcut:
+            //   const SingleActivator(LogicalKeyboardKey.keyS, )
+          ),
+          MenuEntry(label: 'Exit', onPressed: () => exit(0))
         ],
       ),
     ];

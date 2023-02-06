@@ -59,7 +59,7 @@ void main() async {
   );
 
   doWhenWindowReady(() {
-    final initialSize = Size(1000, 650);
+    final initialSize = Size(1000, 700);
     appWindow.minSize = initialSize;
     appWindow.size = initialSize;
     appWindow.title = 'Maple Tracker';
