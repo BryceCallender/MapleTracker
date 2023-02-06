@@ -33,16 +33,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: StreamBuilder<List<Character>>(
-        stream: _characters,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Column(
-              children: [
-                Menubar(),
-                Expanded(
+    return StreamBuilder<List<Character>>(
+      stream: _characters,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Column(
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: Menubar(),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       Expanded(
@@ -75,16 +82,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-              ],
-            );
-          } else {
-            return LoadingAnimationWidget.twoRotatingArc(
-              color: Colors.blueAccent,
-              size: 50.0,
-            );
-          }
-        },
-      ),
+              ),
+            ],
+          );
+        } else {
+          return LoadingAnimationWidget.twoRotatingArc(
+            color: Colors.blueAccent,
+            size: 50.0,
+          );
+        }
+      },
     );
   }
 }
