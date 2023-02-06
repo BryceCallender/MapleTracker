@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/character_progress.dart';
-import 'package:maple_daily_tracker/models/tracker.dart';
+import 'package:maple_daily_tracker/models/character.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 
 class ProgressReport extends StatelessWidget {
-  const ProgressReport({Key? key}) : super(key: key);
+  const ProgressReport({Key? key, required this.characters}) : super(key: key);
+
+  final List<Character> characters;
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +20,8 @@ class ProgressReport extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (var character in tracker.characters) ...[
-                    CharacterProgress(character: character,),
+                  for (var i = 0; i < characters.length; i++) ...[
+                    CharacterProgress(character: characters[i], index: i,),
                     SizedBox(height: 12.0,)
                   ]
                 ],

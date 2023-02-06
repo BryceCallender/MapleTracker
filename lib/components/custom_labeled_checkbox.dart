@@ -12,13 +12,13 @@ class CustomLabeledCheckbox extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onChanged,
-    this.checkboxType = CheckboxType.Child,
+    this.checkboxType = CheckboxType.Parent,
     this.activeColor,
   })  : assert(
           (checkboxType == CheckboxType.Child && value != null) ||
               checkboxType == CheckboxType.Parent,
         ),
-        tristate = checkboxType == CheckboxType.Parent ? true : false;
+        tristate = checkboxType == CheckboxType.Parent;
 
   final String label;
   final bool? value;
@@ -30,23 +30,25 @@ class CustomLabeledCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-
     return InkWell(
       onTap: _onChanged,
       child: Row(
         children: <Widget>[
+          checkboxType == CheckboxType.Child
+              ? SizedBox(width: 32)
+              : SizedBox(width: 0),
           Checkbox(
             tristate: tristate,
             value: value,
             onChanged: (val) => _onChanged(),
-            activeColor: activeColor ?? themeData.toggleableActiveColor,
-            checkColor: (activeColor ?? themeData.toggleableActiveColor)
-                .toLuminanceColor(),
           ),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: themeData.textTheme.subtitle1,
+          Expanded(
+            child: Text(
+              label,
+              style: themeData.textTheme.titleMedium,
+              overflow: TextOverflow.ellipsis,
+            ),
           )
         ],
       ),
@@ -55,7 +57,9 @@ class CustomLabeledCheckbox extends StatelessWidget {
 
   void _onChanged() {
     if (value != null) {
-      onChanged(!value!);
+      onChanged(!(value!));
+    } else {
+      onChanged(value);
     }
   }
 }

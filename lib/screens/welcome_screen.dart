@@ -21,16 +21,24 @@ class WelcomeScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Center(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               "assets/logo/logo.png",
               width: size.width * 0.50,
               height: size.height * 0.50,
             ),
+            SizedBox(
+              height: 32,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Track your ", style: Theme.of(context).textTheme.displaySmall,),
+                Text(
+                  "Track your ",
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
                 SizedBox(
                   width: 400,
                   child: AnimatedTextKit(

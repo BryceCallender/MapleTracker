@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 enum ThemeType {
-  Orange_Light,
+  Teal,
+  Green,
+  Orange,
+  Pink,
+  Cyan,
+  Amber,
+  Blue,
+  Red,
+  Purple,
+  Yellow
 }
 
 // CREDIT : https://github.com/gskinnerTeam/flutter-folio/blob/master/lib/themes.dart
@@ -11,7 +20,7 @@ enum ThemeType {
 //      AppTheme theme = context.watch();
 //      return Container(color: theme.accentColor);
 class AppTheme {
-  static ThemeType defaultTheme = ThemeType.Orange_Light;
+  static ThemeType defaultTheme = ThemeType.Teal;
 
   final ThemeType type;
   final bool isDark;
@@ -49,7 +58,7 @@ class AppTheme {
   /// Creates an AppTheme from a provided Type.
   factory AppTheme.fromType(ThemeType t) {
     switch (t) {
-      case ThemeType.Orange_Light:
+      case ThemeType.Teal:
         return AppTheme(
           isDark: false,
           type: t,
