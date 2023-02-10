@@ -27,7 +27,7 @@ class DatabaseService {
   }
 
   Future<Map<String, dynamic>> addCharacter(Character character) async {
-    return await client.from("characters").insert(character.toMap()).select();
+    return await client.from("characters").insert(character.toMap()).select().single();
   }
 
   Future<void> updateUserResetTimes(String subject) async {

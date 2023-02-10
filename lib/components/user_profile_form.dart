@@ -2,9 +2,12 @@ import 'package:anchored_popups/anchored_popups.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/styled_circle_image.dart';
+import 'package:maple_daily_tracker/constants.dart';
+import 'package:maple_daily_tracker/models/profile.dart';
 import 'package:maple_daily_tracker/providers/theme_settings.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:maple_daily_tracker/services/authentication_service.dart';
+import 'package:maple_daily_tracker/services/database_service.dart';
 import 'package:maple_daily_tracker/spacers.dart';
 import 'package:maple_daily_tracker/styled_buttons.dart';
 import 'package:maple_daily_tracker/styles.dart';
@@ -37,7 +40,7 @@ class _UserProfileFormState extends State<UserProfileForm> {
 
   @override
   Widget build(BuildContext context) {
-    final profile = context.read<TrackerModel>().profile;
+    final profile = context.watch<TrackerModel>().profile;
     final themeData = context.watch<ThemeSettings>();
 
     return Stack(
@@ -54,8 +57,8 @@ class _UserProfileFormState extends State<UserProfileForm> {
             SimpleBtn(
               cornerRadius: 99,
               hoverColors: BtnColors(
-                fg: themeData.secondary.withOpacity(0.7),
-                bg: themeData.secondary.withOpacity(0.7),
+                fg: themeData.secondary.withOpacity(0.5),
+                bg: themeData.secondary.withOpacity(0.5),
               ),
               onPressed: _handleImageUpload,
               child: SizedBox(
@@ -119,20 +122,20 @@ class _UserProfileFormState extends State<UserProfileForm> {
 
       final fileName = '${DateTime.now().toIso8601String()}.$extension';
 
-      // await dbService.uploadBinary(fileName, bytes, mimeType);
-      // final imageUrlResponse = await dbService.createdSignedImageUrl(fileName);
+      final dbService = DatabaseService(supabase);
+      await dbService.uploadBinary(fileName, bytes, mimeType);
+      final imageUrlResponse = await dbService.createdSignedImageUrl(fileName);
 
-      setState(() {
-        //_avatarUrl = imageUrlResponse;
-      });
+      final userId = supabase.auth.currentUser!.id;
+      await dbService.upsertProfile(userId, imageUrlResponse);
 
-      // final userId = supabase.auth.currentUser!.id;
-      // await dbService.upsertProfile(userId, _avatarUrl);
+      context.read<TrackerModel>().setProfileUrl(imageUrlResponse);
     }
   }
 
   void _handleLogoutPressed() {
     AnchoredPopups.of(context)?.hide();
+    context.read<TrackerModel>().clear();
     context.read<AuthenticationService>().signOut();
   }
 }

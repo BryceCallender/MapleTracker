@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/decorated_container.dart';
+import 'package:maple_daily_tracker/providers/theme_settings.dart';
 import 'package:maple_daily_tracker/spacers.dart';
 import 'package:maple_daily_tracker/styles.dart';
+import 'package:provider/provider.dart';
 
 class BtnColors {
   BtnColors({required this.bg, required this.fg, this.outline});
@@ -75,10 +77,11 @@ class _RawBtnState extends State<RawBtn> {
           return normal;
         });
     VisualDensity density = Theme.of(context).visualDensity;
+    ThemeSettings themeSettings = context.watch<ThemeSettings>();
 
     List<BoxShadow> shadows = (widget.enableShadow) ? Shadows.universal : [];
     BtnColors normalColors = widget.normalColors ?? BtnColors(fg: Color(0xff747474), bg: Colors.transparent);
-    BtnColors hoverColors = widget.hoverColors ?? BtnColors(fg: Color(0xffd81e1e), bg: Color(0xffd81e1e).withOpacity(.1));
+    BtnColors hoverColors = widget.hoverColors ?? BtnColors(fg: themeSettings.secondary, bg: themeSettings.secondary.withOpacity(.1));
     double focusMargin = widget.focusMargin ?? -5;
     return AnimatedOpacity(
       duration: Times.fast,

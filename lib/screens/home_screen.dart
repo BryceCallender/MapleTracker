@@ -1,7 +1,4 @@
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:maple_daily_tracker/components/menubar.dart';
 import 'package:maple_daily_tracker/components/progress_report.dart';
