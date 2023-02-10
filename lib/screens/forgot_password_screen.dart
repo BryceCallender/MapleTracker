@@ -22,7 +22,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: Column(
         children: [
           SupaSendEmail(
-            redirectUrl: SUPABASE_REDIRECT_URL,
+            redirectUrl: SUPABASE_FORGOT_PASSWORD_REDIRECT_URL,
             onSuccess: () {
               print('success password email sent');
               setState(() {

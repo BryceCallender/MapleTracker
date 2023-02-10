@@ -18,7 +18,7 @@ class StyledCircleImage extends StatelessWidget {
           cursor: SystemMouseCursors.click,
           child: DecoratedContainer(
             clipChild: true,
-            color: Colors.blue,
+            color: Color(0xFF41464b),
             borderColor: Colors.white,
             borderWidth: 1,
             borderRadius: 99,

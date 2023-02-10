@@ -60,9 +60,9 @@ class Action {
     return data;
   }
 
-  Action copyWith({int? order}) {
+  Action copyWith({int? order, int? id, int? characterId}) {
     return Action(
-        id: id,
+        id: id ?? this.id,
         name: name,
         done: done,
         order: order ?? this.order,
@@ -71,6 +71,31 @@ class Action {
         createdOn: createdOn,
         updatedOn: updatedOn,
         actionType: actionType,
-        characterId: characterId);
+        characterId: characterId ?? this.characterId,
+    );
   }
+
+  Action copyWithNoId({int? order, int? characterId}) {
+    return Action(
+      id: null,
+      name: name,
+      done: done,
+      order: order ?? this.order,
+      isTemp: isTemp,
+      removalTime: removalTime,
+      createdOn: createdOn,
+      updatedOn: updatedOn,
+      actionType: actionType,
+      characterId: characterId ?? this.characterId,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is Action &&
+          other.runtimeType == runtimeType &&
+          other.name == name;
+
+  @override
+  int get hashCode => name.hashCode;
 }

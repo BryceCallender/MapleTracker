@@ -17,7 +17,7 @@ class SignUpScreen extends StatelessWidget {
       children: [
         SupaEmailAuth(
           authAction: SupaAuthAction.signUp,
-          redirectUrl: SUPABASE_REDIRECT_URL,
+          redirectUrl: SUPABASE_LOGIN_REDIRECT_URL,
           onSuccess: (response) {
             context.showSnackBar(
                 message: 'Account registered! Check email for confirmation link.'

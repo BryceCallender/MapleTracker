@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/mappers/mapper.dart';
 import 'package:maple_daily_tracker/models/action-type.dart';
@@ -101,8 +103,17 @@ class TrackerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>> addCharacter(Character character) async {
-    return await dbService.addCharacter(character);
+  Future<void> addCharacter(Character character, {List<Maple.Action>? actions}) async {
+    final createdCharacter = Character.fromJson(await dbService.addCharacter(character));
+
+    if (actions != null) {
+      List<Maple.Action> newActions = [];
+      actions.forEach((action) {
+        newActions.add(action.copyWith(characterId: createdCharacter.id!));
+      });
+
+      await dbService.upsertActions(newActions);
+    }
   }
 
   void upsertActions(List<Maple.Action> actions) async {
@@ -125,11 +136,15 @@ class TrackerModel extends ChangeNotifier {
   void removeCharacter(Character character) async {
     await dbService.deleteActions(character.id!);
     await dbService.deleteCharacter(character.id!);
-    _tabController.animateTo(_tabController.index - 1);
+
+    if (_tabController.index == _characters.length - 1) {
+      _tabController.animateTo(_tabController.index - 1);
+    }
+    
     _characters.removeWhere((c) => c.id == character.id);
   }
 
-  void saveResetTimes(String? subject) async {
+  Future<void> saveResetTimes(String? subject) async {
     if (subject != null)
       await dbService.updateUserResetTimes(subject);
   }
@@ -173,6 +188,11 @@ class TrackerModel extends ChangeNotifier {
 
     await dbService.upsertActions(actions);
 
+    notifyListeners();
+  }
+
+  void setProfileUrl(String url) {
+    profile?.avatarUrl = url;
     notifyListeners();
   }
 }

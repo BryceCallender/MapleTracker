@@ -7,6 +7,7 @@ import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:maple_daily_tracker/components/profile_button.dart';
 import 'package:maple_daily_tracker/extensions/color_extensions.dart';
 import 'package:maple_daily_tracker/providers/theme_settings.dart';
+import 'package:maple_daily_tracker/screens/forgot_password_screen.dart';
 import 'package:maple_daily_tracker/screens/home_screen.dart';
 import 'package:maple_daily_tracker/screens/login_screen.dart';
 import 'package:maple_daily_tracker/services/authentication_service.dart';
@@ -83,6 +84,11 @@ class MyApp extends StatelessWidget {
           child: const MyHomePage(title: 'Maple Daily Tracker'),
         ),
         debugShowCheckedModeBanner: false,
+        onGenerateRoute: (settings) {
+          if (settings.name == '/forgot-password-callback') {
+            print('forgot password clicked');
+          }
+        }
       ),
     );
   }
@@ -105,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     FlutterWindowClose.setWindowShouldCloseHandler(() async {
       print('closing and saving reset times...');
-      context.read<TrackerModel>().saveResetTimes(supabase.auth.currentUser?.id);
+      await context.read<TrackerModel>().saveResetTimes(supabase.auth.currentUser?.id);
       return true;
     });
   }
@@ -139,6 +145,7 @@ class AuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthState?>();
+    print(authState?.event.toString());
 
     if (supabase.auth.currentUser != null) {
       return HomeScreen();

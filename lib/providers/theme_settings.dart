@@ -47,6 +47,10 @@ class ThemeSettings extends ChangeNotifier {
             foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
           ),
         ),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: MaterialStateProperty.all<Color>(secondary),
+          checkColor: MaterialStateProperty.all<Color>(secondary.toLuminanceColor()),
+        ),
         tabBarTheme: TabBarTheme(
           indicator: UnderlineTabIndicator(
             borderSide: BorderSide(
@@ -54,7 +58,8 @@ class ThemeSettings extends ChangeNotifier {
               color: secondary,
             ),
           ),
-        ));
+        ),
+    );
 
     notifyListeners();
   }

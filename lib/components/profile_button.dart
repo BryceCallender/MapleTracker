@@ -21,16 +21,15 @@ class ProfileButton extends StatelessWidget {
     Widget profileIcon = StyledCircleImage(
         padding: EdgeInsets.all(Insets.xs), url: profile?.avatarUrl);
 
+    if (profile == null)
+      return Container();
+
     return AnchoredPopUpRegion.hoverWithClick(
       clickPopChild: ClipRect(child: UserProfileCard()),
       hoverPopChild: const StyledTooltip("Open Profile Menu"),
       buttonBuilder: (_, child, show) => SimpleBtn(
         onPressed: show,
         child: child,
-        hoverColors: BtnColors(
-          fg: themeData.secondary.withOpacity(0.5),
-          bg: themeData.secondary.withOpacity(0.5),
-        ),
       ),
       hoverPopAnchor: invertRow ? Alignment.topRight : Alignment.topLeft,
       clickPopAnchor: invertRow ? Alignment.topRight : Alignment.topLeft,

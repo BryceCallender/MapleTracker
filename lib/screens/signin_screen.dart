@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maple_daily_tracker/constants.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';

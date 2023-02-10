@@ -35,7 +35,7 @@ class CustomLabeledCheckbox extends StatelessWidget {
       child: Row(
         children: <Widget>[
           checkboxType == CheckboxType.Child
-              ? SizedBox(width: 32)
+              ? SizedBox(width: 48)
               : SizedBox(width: 0),
           Checkbox(
             tristate: tristate,
