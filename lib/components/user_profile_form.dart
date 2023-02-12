@@ -46,8 +46,9 @@ class _UserProfileFormState extends State<UserProfileForm> {
     return Stack(
       children: [
         Align(
-            alignment: Alignment.topLeft,
-            child: Text('v$appVersion', style: TextStyles.caption)),
+          alignment: Alignment.topLeft,
+          child: Text('v$appVersion', style: TextStyles.caption),
+        ),
 
         /// Profile
         Column(
@@ -67,7 +68,10 @@ class _UserProfileFormState extends State<UserProfileForm> {
                   padding: EdgeInsets.all(Insets.xs),
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
-                    child: StyledCircleImage(url: profile?.avatarUrl),
+                    child: StyledCircleImage(
+                      url: profile?.avatarUrl,
+                      isBig: true,
+                    ),
                   ),
                 ),
               ),
@@ -86,7 +90,7 @@ class _UserProfileFormState extends State<UserProfileForm> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'brycec848@gmail.com',
+                profile?.email ?? profile?.username ?? 'Unknown user',
                 style: TextStyles.body1,
               ),
             ),

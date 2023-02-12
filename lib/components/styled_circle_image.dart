@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/decorated_container.dart';
 
 class StyledCircleImage extends StatelessWidget {
-  const StyledCircleImage({Key? key, required this.url, this.padding})
+  const StyledCircleImage({Key? key, required this.url, this.padding, this.isBig})
       : super(key: key);
 
   final EdgeInsets? padding;
   final String? url;
+  final bool? isBig;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +28,7 @@ class StyledCircleImage extends StatelessWidget {
                 : Icon(
                     Icons.person_rounded,
                     color: Colors.black,
+              size: isBig != null ? 48 : null,
                   ),
           ),
         ),

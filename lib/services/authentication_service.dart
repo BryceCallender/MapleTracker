@@ -5,6 +5,9 @@ class AuthenticationService with ChangeNotifier {
   final GoTrueClient _supabaseAuth;
   String errorMessage = "";
 
+  bool showOtpScreen = false;
+  bool showResetPasswordScreen = false;
+
   AuthenticationService(this._supabaseAuth);
 
   Stream<AuthState?> get authStateChanges => _supabaseAuth.onAuthStateChange;
@@ -23,6 +26,17 @@ class AuthenticationService with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> signInWithOtp({ required String email, required String otpCode }) async {
+    await _supabaseAuth.verifyOTP(
+        email: email,
+        token: otpCode,
+        type: OtpType.recovery,
+    );
+
+    setResetPassword();
+    notifyListeners();
+  }
+
   Future<void> signOut() async {
     await _supabaseAuth.signOut();
     notifyListeners();
@@ -38,6 +52,26 @@ class AuthenticationService with ChangeNotifier {
       errorMessage = "Unexpected error occurred";
     }
 
+    notifyListeners();
+  }
+
+  Future<void> resetPassword({ required String password }) async {
+    await _supabaseAuth.updateUser(
+      UserAttributes(
+        password: password
+      )
+    );
+    showResetPasswordScreen = false;
+    notifyListeners();
+  }
+
+  setResetPassword({bool? value}) {
+    showResetPasswordScreen = value ?? true;
+    notifyListeners();
+  }
+
+  setOTP({bool? value}) {
+    showOtpScreen = value ?? true;
     notifyListeners();
   }
 }

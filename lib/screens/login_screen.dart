@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/logo_typer.dart';
 import 'package:maple_daily_tracker/screens/forgot_password_screen.dart';
+import 'package:maple_daily_tracker/screens/otp_screen.dart';
+import 'package:maple_daily_tracker/screens/reset_password_screen.dart';
 import 'package:maple_daily_tracker/screens/signin_screen.dart';
 import 'package:maple_daily_tracker/screens/signup_screen.dart';
+import 'package:maple_daily_tracker/services/authentication_service.dart';
 import 'package:maple_daily_tracker/styles.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final showOtpScreen = context.watch<AuthenticationService>().showOtpScreen;
     return Center(
       child: Container(
         child: Padding(
@@ -37,7 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (forgotPassword) ... [
+                    if (showOtpScreen) ... [
+                      OtpScreen()
+                    ]
+                    else if (forgotPassword) ... [
                       ForgotPasswordScreen(
                         onSignIn: _onSignInClicked,
                       ),

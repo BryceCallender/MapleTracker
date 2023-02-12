@@ -24,6 +24,11 @@ class SignInScreen extends StatelessWidget {
             context.read<TrackerModel>().fetchProfileInfo(authResponse.user!.id);
           },
         ),
+        // SupaSocialsAuth(
+        //     socialProviders: [SocialProviders.google],
+        //     colored: false,
+        //     onSuccess: (session) {},
+        // ),
         TextButton(
             child: const Text(
               'Forgot Password? Click here',

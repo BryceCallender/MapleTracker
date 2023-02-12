@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/components/user_profile_form.dart';
+import 'package:maple_daily_tracker/providers/theme_settings.dart';
 import 'package:maple_daily_tracker/styles.dart';
+import 'package:provider/provider.dart';
 
 class UserProfileCard extends StatelessWidget {
   const UserProfileCard({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final themeSettings = context.watch<ThemeSettings>();
     final themeData = Theme.of(context);
     VisualDensity density = themeData.visualDensity;
+
     return SizedBox(
       width: 280,
       height: 325 + density.vertical * 24,
@@ -30,6 +34,7 @@ class UserProfileCard extends StatelessWidget {
                   color: Color(0xFF41464b),
                   borderRadius:
                       const BorderRadius.all(Corners.lgRadius),
+                  border: Border.all(color: themeSettings.primary)
                 ),
                 child: const UserProfileForm(),
               ),

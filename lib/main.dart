@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:anchored_popups/anchored_popups.dart';
@@ -10,6 +11,7 @@ import 'package:maple_daily_tracker/providers/theme_settings.dart';
 import 'package:maple_daily_tracker/screens/forgot_password_screen.dart';
 import 'package:maple_daily_tracker/screens/home_screen.dart';
 import 'package:maple_daily_tracker/screens/login_screen.dart';
+import 'package:maple_daily_tracker/screens/reset_password_screen.dart';
 import 'package:maple_daily_tracker/services/authentication_service.dart';
 import 'package:maple_daily_tracker/services/database_service.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
@@ -18,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:uni_links/uni_links.dart';
 import 'package:uni_links_desktop/uni_links_desktop.dart';
 
 import 'constants.dart';
@@ -104,16 +107,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  StreamSubscription? _sub;
+
   @override
   void initState() {
     super.initState();
     getProfile();
+    initUniLinks();
 
     FlutterWindowClose.setWindowShouldCloseHandler(() async {
       print('closing and saving reset times...');
       await context.read<TrackerModel>().saveResetTimes(supabase.auth.currentUser?.id);
       return true;
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _sub?.cancel();
   }
 
   @override
@@ -137,6 +149,16 @@ class _MyHomePageState extends State<MyHomePage> {
     } on PostgrestException catch (error) {
     } catch (error) {}
   }
+
+  Future<void> initUniLinks() async {
+    _sub = linkStream.listen((String? link) {
+      if (link?.startsWith(SUPABASE_FORGOT_PASSWORD_REDIRECT_URL) ?? false) {
+        context.read<AuthenticationService>().setResetPassword();
+      }
+    }, onError: (err) {
+      // Handle exception by warning the user their action did not succeed
+    });
+  }
 }
 
 class AuthenticationWrapper extends StatelessWidget {
@@ -145,7 +167,12 @@ class AuthenticationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthState?>();
-    print(authState?.event.toString());
+    final showResetPassword = context.watch<AuthenticationService>().showResetPasswordScreen;
+    print(authState?.event.name);
+
+    if (showResetPassword) {
+      return ResetPasswordScreen();
+    }
 
     if (supabase.auth.currentUser != null) {
       return HomeScreen();
