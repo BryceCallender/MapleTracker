@@ -1,5 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:maple_daily_tracker/styles.dart';
 
 class LogoTyper extends StatelessWidget {
   const LogoTyper({Key? key}) : super(key: key);
@@ -12,15 +13,17 @@ class LogoTyper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Image.asset(
           "assets/logo/logo.png",
-          width: 100,
-          height: 100,
+          width: size.width / 3.0,
+          height: size.height / 3.0,
         ),
+        SizedBox(height: Insets.lg,),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -32,6 +32,7 @@ class _CharacterActionsState extends State<CharacterActions>
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     super.build(context);
     return StreamBuilder<List<Maple.Action>>(
         stream: _actions,
@@ -58,12 +59,10 @@ class _CharacterActionsState extends State<CharacterActions>
             );
           } else {
             return SizedBox(
-              height: 499,
+              height: size.height / 1.5,
               child: Center(
                 child: LoadingAnimationWidget.twoRotatingArc(
-                    color: Colors.blueAccent,
-                    size: 100 //constraints.maxHeight * 0.20,
-                    ),
+                    color: Colors.blueAccent, size: size.height * 0.20),
               ),
             );
           }

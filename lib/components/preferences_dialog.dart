@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:maple_daily_tracker/providers/theme_settings.dart';
+import 'package:maple_daily_tracker/styles.dart';
 import 'package:provider/provider.dart';
 
 class PreferencesDialog extends StatefulWidget {
@@ -16,9 +17,8 @@ class _PreferencesDialogState extends State<PreferencesDialog> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    final themeData = context.read<ThemeSettings>();
+    ThemeSettings themeData = context.read<ThemeSettings>();
     primary = themeData.primary;
     secondary = themeData.secondary;
   }
@@ -39,6 +39,7 @@ class _PreferencesDialogState extends State<PreferencesDialog> {
               Row(
                 children: [
                   Text('Primary Color'),
+                  SizedBox(width: Insets.sm),
                   InkWell(
                     borderRadius: BorderRadius.circular(99.0),
                     child: Container(
@@ -50,7 +51,6 @@ class _PreferencesDialogState extends State<PreferencesDialog> {
                       ),
                     ),
                     onTap: () => pickColor(context, primary, (color) {
-                      print(color);
                       setState(() {
                         primary = color;
                       });
@@ -61,6 +61,7 @@ class _PreferencesDialogState extends State<PreferencesDialog> {
               Row(
                 children: [
                   Text('Secondary Color'),
+                  SizedBox(width: Insets.sm),
                   InkWell(
                     borderRadius: BorderRadius.circular(99.0),
                     child: Container(

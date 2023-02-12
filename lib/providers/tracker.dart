@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:maple_daily_tracker/constants.dart';
 import 'package:maple_daily_tracker/mappers/mapper.dart';
 import 'package:maple_daily_tracker/models/action-type.dart';
 import 'package:maple_daily_tracker/models/character.dart';
@@ -38,6 +39,11 @@ class TrackerModel extends ChangeNotifier {
 
   Future<void> fetchProfileInfo(String subject) async {
     profile = Profile.fromJson(await dbService.getProfile(subject));
+
+    if (profile != null) {
+      profile!.email = supabase.auth.currentUser!.email;
+    }
+
     notifyListeners();
   }
 

@@ -26,6 +26,9 @@ class ThemeSettings extends ChangeNotifier {
   }
 
   void createTheme(Color primary, Color secondary) {
+    this.primary = primary;
+    this.secondary = secondary;
+
     _currentTheme = ThemeData.dark().copyWith(
         colorScheme: ThemeData.dark()
             .colorScheme
