@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Stream<List<Character>>? _characters;
   late SharedPreferences prefs;
   bool hasOnboarded = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -37,12 +38,21 @@ class _HomeScreenState extends State<HomeScreen> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       hasOnboarded = prefs.getBool('onboarded') ?? false;
+      _isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
+    if (_isLoading)
+      return Center(
+        child: LoadingAnimationWidget.twoRotatingArc(
+          color: Colors.blueAccent,
+          size: size.height / 4.0,
+        ),
+      );
 
     return !hasOnboarded
         ? OnboardingScreen(

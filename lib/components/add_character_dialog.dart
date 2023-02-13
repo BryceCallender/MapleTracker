@@ -34,9 +34,6 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _classController.dispose();
-    _characterController.dispose();
     super.dispose();
   }
 

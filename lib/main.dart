@@ -152,7 +152,6 @@ class _MyHomePageState extends State<MyHomePage> {
         context.read<AuthenticationService>().setResetPassword();
       }
     }, onError: (err) {
-      // Handle exception by warning the user their action did not succeed
       // context.showErrorSnackBar(message: 'Deeplink handling failed...');
     });
   }
