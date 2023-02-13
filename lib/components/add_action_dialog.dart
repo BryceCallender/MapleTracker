@@ -36,6 +36,12 @@ class _AddActionDialogState extends State<AddActionDialog> {
   }
 
   @override
+  void dispose() {
+    _actionName.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width * 0.50;
     var height = MediaQuery.of(context).size.height * 0.50;

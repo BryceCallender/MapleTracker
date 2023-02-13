@@ -7,6 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:maple_daily_tracker/components/preferences_dialog.dart';
 import 'package:maple_daily_tracker/models/old-maple-tracker.dart' as OMT;
 import 'package:maple_daily_tracker/components/import_characters_dialog.dart';
+import 'package:maple_daily_tracker/models/profile.dart';
+import 'package:maple_daily_tracker/providers/tracker.dart';
+import 'package:maple_daily_tracker/services/authentication_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
 class MenuEntry {
   const MenuEntry(
@@ -64,6 +69,14 @@ class Menubar extends StatefulWidget {
 
 class _MenubarState extends State<Menubar> {
   ShortcutRegistryEntry? _shortcutsEntry;
+  String appVersion = '';
+  Profile? profile;
+
+  @override
+  void initState() {
+    super.initState();
+    getAppVersion();
+  }
 
   @override
   void dispose() {
@@ -73,6 +86,7 @@ class _MenubarState extends State<Menubar> {
 
   @override
   Widget build(BuildContext context) {
+    profile = context.watch<TrackerModel>().profile;
     return _platformMenuBar();
   }
 
@@ -83,32 +97,100 @@ class _MenubarState extends State<Menubar> {
           PlatformMenu(
             label: "Maple Daily Tracker",
             menus: [
-              if (PlatformProvidedMenuItem.hasMenu(
-                  PlatformProvidedMenuItemType.about))
-                const PlatformProvidedMenuItem(
-                    type: PlatformProvidedMenuItemType.about),
-              PlatformMenuItem(
-                  label: 'Settings',
-                  onSelected: () async {
-                    _showSettingsDialog(context);
-                  },
-                  shortcut: const SingleActivator(LogicalKeyboardKey.comma,
-                      meta: true)),
-              if (PlatformProvidedMenuItem.hasMenu(
-                  PlatformProvidedMenuItemType.quit))
-                const PlatformProvidedMenuItem(
-                    type: PlatformProvidedMenuItemType.quit),
+              PlatformMenuItemGroup(
+                members: [
+                  if (PlatformProvidedMenuItem.hasMenu(
+                      PlatformProvidedMenuItemType.about))
+                    const PlatformProvidedMenuItem(
+                        type: PlatformProvidedMenuItemType.about),
+                ],
+              ),
+              if (profile != null)
+                PlatformMenuItemGroup(
+                  members: [
+                    PlatformMenuItem(
+                      label: 'Settings',
+                      onSelected: () async {
+                        _showSettingsDialog(context);
+                      },
+                      shortcut: const SingleActivator(LogicalKeyboardKey.comma,
+                          meta: true),
+                    ),
+                  ],
+                ),
+              PlatformMenuItemGroup(
+                members: [
+                  if (PlatformProvidedMenuItem.hasMenu(
+                      PlatformProvidedMenuItemType.servicesSubmenu))
+                    const PlatformProvidedMenuItem(
+                        type: PlatformProvidedMenuItemType.servicesSubmenu),
+                ],
+              ),
+              PlatformMenuItemGroup(
+                members: [
+                  if (PlatformProvidedMenuItem.hasMenu(
+                      PlatformProvidedMenuItemType.hide))
+                    const PlatformProvidedMenuItem(
+                        type: PlatformProvidedMenuItemType.hide),
+                  if (PlatformProvidedMenuItem.hasMenu(
+                      PlatformProvidedMenuItemType.hideOtherApplications))
+                    const PlatformProvidedMenuItem(
+                        type:
+                            PlatformProvidedMenuItemType.hideOtherApplications),
+                  if (PlatformProvidedMenuItem.hasMenu(
+                      PlatformProvidedMenuItemType.showAllApplications))
+                    const PlatformProvidedMenuItem(
+                        type: PlatformProvidedMenuItemType.showAllApplications),
+                ],
+              ),
+              PlatformMenuItemGroup(members: [
+                if (PlatformProvidedMenuItem.hasMenu(
+                    PlatformProvidedMenuItemType.quit))
+                  const PlatformProvidedMenuItem(
+                      type: PlatformProvidedMenuItemType.quit),
+              ]),
+            ],
+          ),
+          if (profile != null)
+            PlatformMenu(
+              label: "File",
+              menus: [
+                PlatformMenuItem(
+                  label: 'Import',
+                  onSelected: importData,
+                  shortcut: const SingleActivator(LogicalKeyboardKey.keyO,
+                      meta: true),
+                )
+              ],
+            ),
+          PlatformMenu(
+            label: 'View',
+            menus: [
+              PlatformMenuItemGroup(
+                members: [
+                  if (PlatformProvidedMenuItem.hasMenu(PlatformProvidedMenuItemType.toggleFullScreen))
+                    const PlatformProvidedMenuItem(type: PlatformProvidedMenuItemType.toggleFullScreen),
+                ],
+              ),
             ],
           ),
           PlatformMenu(
-            label: "File",
+            label: 'Window',
             menus: [
-              PlatformMenuItem(
-                label: 'Import',
-                onSelected: importData,
-                shortcut:
-                    const SingleActivator(LogicalKeyboardKey.keyO, meta: true),
-              )
+              PlatformMenuItemGroup(
+                members: [
+                  if (PlatformProvidedMenuItem.hasMenu(PlatformProvidedMenuItemType.minimizeWindow))
+                    const PlatformProvidedMenuItem(type: PlatformProvidedMenuItemType.minimizeWindow),
+                  if (PlatformProvidedMenuItem.hasMenu(PlatformProvidedMenuItemType.zoomWindow))
+                    const PlatformProvidedMenuItem(type: PlatformProvidedMenuItemType.zoomWindow),
+                ],
+              ),
+              PlatformMenuItemGroup(
+                members: [
+                  if (PlatformProvidedMenuItem.hasMenu(PlatformProvidedMenuItemType.arrangeWindowsInFront))
+                    const PlatformProvidedMenuItem(type: PlatformProvidedMenuItemType.arrangeWindowsInFront),
+                ],
+              ),
             ],
           ),
         ],
@@ -142,8 +224,6 @@ class _MenubarState extends State<Menubar> {
         ],
       ),
     ];
-    // (Re-)register the shortcuts with the ShortcutRegistry so that they are
-    // available to the entire application, and update them if they've changed.
     _shortcutsEntry?.dispose();
     _shortcutsEntry =
         ShortcutRegistry.of(context).addAll(MenuEntry.shortcuts(result));
@@ -154,7 +234,7 @@ class _MenubarState extends State<Menubar> {
     showAboutDialog(
       context: context,
       applicationName: 'Maple Daily Tracker',
-      applicationVersion: '1.0.0',
+      applicationVersion: appVersion,
     );
   }
 
@@ -195,5 +275,12 @@ class _MenubarState extends State<Menubar> {
         return PreferencesDialog();
       },
     );
+  }
+
+  void getAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = packageInfo.version;
+    });
   }
 }

@@ -33,6 +33,14 @@ class _AddCharacterDialog extends State<AddCharacterDialog> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _classController.dispose();
+    _characterController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     sortedClassTypes = List.from(MapleClass.values);

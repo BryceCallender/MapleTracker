@@ -8,8 +8,6 @@ import 'package:maple_daily_tracker/constants.dart';
 import 'package:maple_daily_tracker/models/character.dart';
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:maple_daily_tracker/screens/onboarding_screen.dart';
-import 'package:maple_daily_tracker/screens/reset_password_screen.dart';
-import 'package:maple_daily_tracker/services/authentication_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

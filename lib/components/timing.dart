@@ -52,17 +52,14 @@ class _TimingState extends State<Timing> {
           return;
         
         if (dailyReset! < Duration(seconds: 1)) {
-          print('reset dailies');
           tracker.resetActions(tracker.user!.userId, ActionType.dailies);
         }
 
         if (weeklyBossReset! < Duration(seconds: 1)) {
-          print('reset weekly bosses');
           tracker.resetActions(tracker.user!.userId, ActionType.weeklyBoss);
         }
 
         if (weeklyQuestReset! < Duration(seconds: 1)) {
-          print('reset weekly quests');
           tracker.resetActions(tracker.user!.userId, ActionType.weeklyQuest);
         }
       });
@@ -126,19 +123,15 @@ class _TimingState extends State<Timing> {
       return;
     }
 
-    print('checking...');
     if (user.nextDailyReset != null && now.isAfter(user.nextDailyReset!)) {
-      print('reset dailies');
       tracker.resetActions(user.userId, ActionType.dailies);
     }
 
     if (user.nextWeeklyBossReset != null && now.isAfter(user.nextWeeklyBossReset!)) {
-      print('reset weekly bosses');
       tracker.resetActions(user.userId, ActionType.weeklyBoss);
     }
 
     if (user.nextWeeklyQuestReset != null && now.isAfter(user.nextWeeklyQuestReset!)) {
-      print('reset weekly quests');
       tracker.resetActions(user.userId, ActionType.weeklyQuest);
     }
 

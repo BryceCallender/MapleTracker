@@ -6,9 +6,8 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:context_menus/context_menus.dart';
 import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:maple_daily_tracker/components/profile_button.dart';
-import 'package:maple_daily_tracker/extensions/color_extensions.dart';
+import 'package:maple_daily_tracker/extensions/snackbar_extensions.dart';
 import 'package:maple_daily_tracker/providers/theme_settings.dart';
-import 'package:maple_daily_tracker/screens/forgot_password_screen.dart';
 import 'package:maple_daily_tracker/screens/home_screen.dart';
 import 'package:maple_daily_tracker/screens/login_screen.dart';
 import 'package:maple_daily_tracker/screens/reset_password_screen.dart';
@@ -87,11 +86,6 @@ class MyApp extends StatelessWidget {
           child: const MyHomePage(title: 'Maple Daily Tracker'),
         ),
         debugShowCheckedModeBanner: false,
-        onGenerateRoute: (settings) {
-          if (settings.name == '/forgot-password-callback') {
-            print('forgot password clicked');
-          }
-        }
       ),
     );
   }
@@ -116,7 +110,6 @@ class _MyHomePageState extends State<MyHomePage> {
     initUniLinks();
 
     FlutterWindowClose.setWindowShouldCloseHandler(() async {
-      print('closing and saving reset times...');
       await context.read<TrackerModel>().saveResetTimes(supabase.auth.currentUser?.id);
       return true;
     });
@@ -147,7 +140,10 @@ class _MyHomePageState extends State<MyHomePage> {
       final userId = supabase.auth.currentUser!.id;
       context.read<TrackerModel>().fetchProfileInfo(userId);
     } on PostgrestException catch (error) {
-    } catch (error) {}
+      // context.showErrorSnackBar(message: error.message);
+    } catch (error) {
+      // context.showErrorSnackBar(message: 'Unexpected error occurred.');
+    }
   }
 
   Future<void> initUniLinks() async {
@@ -157,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }, onError: (err) {
       // Handle exception by warning the user their action did not succeed
+      // context.showErrorSnackBar(message: 'Deeplink handling failed...');
     });
   }
 }
@@ -168,7 +165,6 @@ class AuthenticationWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final authState = context.watch<AuthState?>();
     final showResetPassword = context.watch<AuthenticationService>().showResetPasswordScreen;
-    print(authState?.event.name);
 
     if (showResetPassword) {
       return ResetPasswordScreen();

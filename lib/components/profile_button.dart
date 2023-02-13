@@ -16,7 +16,6 @@ class ProfileButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeData = context.watch<ThemeSettings>();
     final profile = context.watch<TrackerModel>().profile;
     Widget profileIcon = StyledCircleImage(
         padding: EdgeInsets.all(Insets.xs), url: profile?.avatarUrl);

@@ -45,7 +45,6 @@ class _OtpScreenState extends State<OtpScreen> {
             onChanged: (pin) {},
             onCompleted: (pin) async {
               await context.read<AuthenticationService>().signInWithOtp(
-                    email: 'team.affinity.cpp@gmail.com',
                     otpCode: pin,
                   );
 

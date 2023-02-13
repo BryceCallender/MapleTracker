@@ -7,28 +7,15 @@ class AuthenticationService with ChangeNotifier {
 
   bool showOtpScreen = false;
   bool showResetPasswordScreen = false;
+  String? emailSentTo = '';
 
   AuthenticationService(this._supabaseAuth);
 
   Stream<AuthState?> get authStateChanges => _supabaseAuth.onAuthStateChange;
 
-  Future<void> signIn({ required String email, required String password }) async {
-    try {
-      //sign in
-      errorMessage = "";
-      await _supabaseAuth.signInWithPassword(email: email, password: password);
-    } on AuthException catch (e) {
-      errorMessage = e.message;
-    } catch (error) {
-      errorMessage = "Unexpected error occurred";
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> signInWithOtp({ required String email, required String otpCode }) async {
+  Future<void> signInWithOtp({ required String otpCode }) async {
     await _supabaseAuth.verifyOTP(
-        email: email,
+        email: emailSentTo,
         token: otpCode,
         type: OtpType.recovery,
     );
@@ -39,19 +26,9 @@ class AuthenticationService with ChangeNotifier {
 
   Future<void> signOut() async {
     await _supabaseAuth.signOut();
-    notifyListeners();
-  }
-
-  Future<void> signUp({ required String email, required String password }) async {
-    try {
-      errorMessage = "";
-      await _supabaseAuth.signUp(email: email, password: password);
-    } on AuthException catch (e) {
-      errorMessage = e.message;
-    } catch (error) {
-      errorMessage = "Unexpected error occurred";
-    }
-
+    showOtpScreen = false;
+    showResetPasswordScreen = false;
+    emailSentTo = '';
     notifyListeners();
   }
 
@@ -70,7 +47,8 @@ class AuthenticationService with ChangeNotifier {
     notifyListeners();
   }
 
-  setOTP({bool? value}) {
+  setOTP(String email, {bool? value}) {
+    emailSentTo = email;
     showOtpScreen = value ?? true;
     notifyListeners();
   }

@@ -171,6 +171,8 @@ class TrackerModel extends ChangeNotifier {
     _characters.clear();
     user = null;
     profile = null;
+
+    notifyListeners();
   }
 
   void importFromOldSave(

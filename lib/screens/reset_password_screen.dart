@@ -21,6 +21,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool? loading = false;
 
   @override
+  void dispose() {
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
