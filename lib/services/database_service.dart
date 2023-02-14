@@ -107,6 +107,10 @@ class DatabaseService {
     await client.from("actions").delete().match({'character_id': characterId});
   }
 
+  Future<void> deleteActionList(List<int> actionIds) async {
+    await client.from("actions").delete().in_('id', actionIds);
+  }
+
   Future<void> resetActions(String subject, int actionType) async {
     await client.rpc("clear_actions_of_type",
         params: {'subject': subject, 'action_type_id': actionType});

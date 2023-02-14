@@ -62,6 +62,8 @@ class _TimingState extends State<Timing> {
         if (weeklyQuestReset! < Duration(seconds: 1)) {
           tracker.resetActions(tracker.user!.userId, ActionType.weeklyQuest);
         }
+
+        tracker.deleteTempActions();
       });
     });
   }

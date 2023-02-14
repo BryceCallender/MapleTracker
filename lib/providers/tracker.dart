@@ -13,6 +13,7 @@ import 'package:maple_daily_tracker/models/user.dart';
 import 'package:maple_daily_tracker/services/database_service.dart';
 import 'package:collection/collection.dart';
 import 'package:maple_daily_tracker/extensions/character_extensions.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 
 class TrackerModel extends ChangeNotifier {
   final List<Character> _characters = [];
@@ -52,6 +53,17 @@ class TrackerModel extends ChangeNotifier {
   }
 
   Stream<List<Character>> listenToCharacters(String subject) {
+    supabase.channel('public:characters').on(
+      RealtimeListenTypes.postgresChanges,
+      ChannelFilter(event: 'DELETE', schema: 'public', table: 'characters'),
+          (payload, [ref]) {
+        Character? deleteCharacter = characters.firstWhereOrNull((c) => c.id == payload.old.id);
+        if (deleteCharacter != null) {
+          _characters.remove(deleteCharacter);
+        }
+      },
+    ).subscribe();
+
     return dbService.listenToCharacters().map((maps) {
       return maps.map((ch) {
         final character = Character.fromJson(ch);
@@ -73,6 +85,18 @@ class TrackerModel extends ChangeNotifier {
   }
 
   Stream<List<Maple.Action>> listenToActions(int characterId) {
+    supabase.channel('public:actions').on(
+      RealtimeListenTypes.postgresChanges,
+      ChannelFilter(event: 'DELETE', schema: 'public', table: 'actions'),
+          (payload, [ref]) {
+          _characters.forEach((character) {
+            character.sections.forEach((key, value) {
+              value.actions.remove(payload.old.id);
+            });
+          });
+      },
+    ).subscribe();
+
     return dbService.listenToActions(characterId).map((maps) {
       notifyListeners();
       return maps.map((a) {
@@ -87,6 +111,26 @@ class TrackerModel extends ChangeNotifier {
 
   void resetActions(String subject, ActionType actionType) async {
     await dbService.resetActions(subject, actionType.index);
+  }
+
+  void deleteTempActions() async {
+    DateTime now = DateTime.now().toUtc();
+    final deleteActionIds = <int>[];
+    characters.forEach((character) {
+      character.sections.forEach((key, value) {
+        value.actionList.forEach((action) {
+          if (action.isTemp ?? false) {
+            if (action.removalTime?.isBefore(now) ?? false) {
+              deleteActionIds.add(action.id!);
+            }
+          }
+        });
+      });
+    });
+
+    if (deleteActionIds.length > 0) {
+      dbService.deleteActionList(deleteActionIds);
+    }
   }
 
   void toggleAction(Maple.Action action) async {
@@ -167,10 +211,12 @@ class TrackerModel extends ChangeNotifier {
     _tabController.animateTo(index);
   }
 
-  void clear() {
+  Future<void> clear() async {
     _characters.clear();
     user = null;
     profile = null;
+
+    await supabase.removeAllChannels();
 
     notifyListeners();
   }

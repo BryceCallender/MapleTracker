@@ -81,4 +81,13 @@ class Character {
 
     return visibleSections > 0 && completedSections == visibleSections;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is Character &&
+          other.runtimeType == runtimeType &&
+          other.name == name;
+
+  @override
+  int get hashCode => name.hashCode;
 }

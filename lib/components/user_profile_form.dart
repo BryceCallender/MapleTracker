@@ -137,9 +137,9 @@ class _UserProfileFormState extends State<UserProfileForm> {
     }
   }
 
-  void _handleLogoutPressed() {
+  void _handleLogoutPressed() async {
     AnchoredPopups.of(context)?.hide();
-    context.read<TrackerModel>().clear();
+    await context.read<TrackerModel>().clear();
     context.read<AuthenticationService>().signOut();
   }
 }

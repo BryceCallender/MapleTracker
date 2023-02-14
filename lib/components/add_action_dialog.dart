@@ -128,7 +128,7 @@ class _AddActionDialogState extends State<AddActionDialog> {
                       order: action?.order ?? widget.actions.length,
                       createdOn: action?.createdOn ?? DateTime.now().toUtc(),
                       isTemp: isTemp ?? action?.isTemp,
-                      removalTime: removalDateTime ?? action?.removalTime,
+                      removalTime: removalDateTime?.toUtc() ?? action?.removalTime,
                       characterId: action?.characterId ?? tracker.character.id!,
                     ),
                   ],
