@@ -20,8 +20,7 @@ class TrackerModel extends ChangeNotifier {
   late DatabaseService dbService;
   User? user;
   Profile? profile;
-
-  int _tabIndex = 0;
+  
   late TabController _tabController;
 
   TrackerModel({required this.dbService});
@@ -30,8 +29,8 @@ class TrackerModel extends ChangeNotifier {
   UnmodifiableListView<Character> get characters =>
       UnmodifiableListView(_characters);
 
-  int get tabIndex => _tabIndex;
-  Character get character => _characters[_tabIndex];
+  int get tabIndex => _tabController.index;
+  Character get character => _characters[tabIndex];
 
   Future<void> fetchUserInfo(String subject) async {
     user = User.fromJson(await dbService.fetchUser(subject));
@@ -61,10 +60,13 @@ class TrackerModel extends ChangeNotifier {
           table: 'characters',
           filter: 'subject_id=eq.$subject'),
       (payload, [ref]) {
-        Character? deleteCharacter =
-            characters.firstWhereOrNull((c) => c.id == payload['old']['id']);
-        if (deleteCharacter != null) {
-          _characters.remove(deleteCharacter);
+        int index =
+            characters.indexWhere((c) => c.id == payload['old']['id']);
+        if (index != -1) {
+          _characters.removeAt(index);
+          if (_tabController.index == index) {
+            _tabController.animateTo(_tabController.index - 1);
+          }
         }
       },
     ).subscribe();
