@@ -55,9 +55,14 @@ class TrackerModel extends ChangeNotifier {
   Stream<List<Character>> listenToCharacters(String subject) {
     supabase.channel('public:characters').on(
       RealtimeListenTypes.postgresChanges,
-      ChannelFilter(event: 'DELETE', schema: 'public', table: 'characters'),
-          (payload, [ref]) {
-        Character? deleteCharacter = characters.firstWhereOrNull((c) => c.id == payload.old.id);
+      ChannelFilter(
+          event: 'DELETE',
+          schema: 'public',
+          table: 'characters',
+          filter: 'subject_id=eq.$subject'),
+      (payload, [ref]) {
+        Character? deleteCharacter =
+            characters.firstWhereOrNull((c) => c.id == payload['old']['id']);
         if (deleteCharacter != null) {
           _characters.remove(deleteCharacter);
         }
@@ -88,12 +93,12 @@ class TrackerModel extends ChangeNotifier {
     supabase.channel('public:actions').on(
       RealtimeListenTypes.postgresChanges,
       ChannelFilter(event: 'DELETE', schema: 'public', table: 'actions'),
-          (payload, [ref]) {
-          _characters.forEach((character) {
-            character.sections.forEach((key, value) {
-              value.actions.remove(payload.old.id);
-            });
+      (payload, [ref]) {
+        _characters.forEach((character) {
+          character.sections.forEach((key, value) {
+            value.actions.remove(payload['old']['id']);
           });
+        });
       },
     ).subscribe();
 
@@ -153,8 +158,10 @@ class TrackerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addCharacter(Character character, {List<Maple.Action>? actions}) async {
-    final createdCharacter = Character.fromJson(await dbService.addCharacter(character));
+  Future<void> addCharacter(Character character,
+      {List<Maple.Action>? actions}) async {
+    final createdCharacter =
+        Character.fromJson(await dbService.addCharacter(character));
 
     if (actions != null) {
       List<Maple.Action> newActions = [];
@@ -190,20 +197,20 @@ class TrackerModel extends ChangeNotifier {
     if (_tabController.index == _characters.length - 1) {
       _tabController.animateTo(_tabController.index - 1);
     }
-    
+
     _characters.removeWhere((c) => c.id == character.id);
   }
 
   Future<void> saveResetTimes(String? subject) async {
-    if (subject != null)
-      await dbService.updateUserResetTimes(subject);
+    if (subject != null) await dbService.updateUserResetTimes(subject);
   }
 
   void setTabController(TabController tabController) {
     _tabController = tabController;
   }
 
-  void changeCharacterOrder(int characterId, int otherCharacterId, int oldOrder, int newOrder) async {
+  void changeCharacterOrder(
+      int characterId, int otherCharacterId, int oldOrder, int newOrder) async {
     await dbService.updateCharacterOrder(characterId, otherCharacterId);
   }
 
