@@ -20,7 +20,7 @@ class TrackerModel extends ChangeNotifier {
   late DatabaseService dbService;
   User? user;
   Profile? profile;
-  
+
   late TabController _tabController;
 
   TrackerModel({required this.dbService});
