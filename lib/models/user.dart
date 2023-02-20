@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class User {
   final String userId;
   final DateTime createdOn;
@@ -5,6 +7,8 @@ class User {
   final DateTime? nextDailyReset;
   final DateTime? nextWeeklyBossReset;
   final DateTime? nextWeeklyQuestReset;
+  final Color? primary;
+  final Color? secondary;
 
   User(
       {required this.userId,
@@ -12,7 +16,9 @@ class User {
       required this.updatedOn,
       required this.nextDailyReset,
       required this.nextWeeklyBossReset,
-      required this.nextWeeklyQuestReset});
+      required this.nextWeeklyQuestReset,
+      required this.primary,
+      required this.secondary});
 
   User.fromJson(Map<String, dynamic> json)
       : userId = json['id'],
@@ -27,5 +33,20 @@ class User {
             : DateTime.parse(json['next_weekly_boss_reset']),
         nextWeeklyQuestReset = json['next_weekly_quest_reset'] == null
             ? null
-            : DateTime.parse(json['next_weekly_quest_reset']);
+            : DateTime.parse(json['next_weekly_quest_reset']),
+        primary = Color(json['primary']),
+        secondary = Color(json['secondary']);
+
+  User copyWith({Color? primary, Color? secondary}) {
+    return User(
+      userId: userId,
+      createdOn: createdOn,
+      updatedOn: updatedOn,
+      nextDailyReset: nextDailyReset,
+      nextWeeklyBossReset: nextWeeklyBossReset,
+      nextWeeklyQuestReset: nextWeeklyQuestReset,
+      primary: primary ?? this.primary,
+      secondary: secondary ?? this.secondary
+    );
+  }
 }

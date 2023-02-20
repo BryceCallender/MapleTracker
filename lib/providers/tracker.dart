@@ -32,13 +32,20 @@ class TrackerModel extends ChangeNotifier {
   int get tabIndex => _tabController.index;
   Character get character => _characters[tabIndex];
 
-  Future<void> fetchUserInfo(String subject) async {
-    user = User.fromJson(await dbService.fetchUser(subject));
+  Future<void> fetchUserInfo() async {
+    user = User.fromJson(await dbService.fetchUser());
+
+    dbService.listenToUser().listen((event) {
+      User streamUser = User.fromJson(event.first);
+      user = user?.copyWith(primary: streamUser.primary, secondary: streamUser.secondary);
+      notifyListeners();
+    });
+
     notifyListeners();
   }
 
-  Future<void> fetchProfileInfo(String subject) async {
-    profile = Profile.fromJson(await dbService.getProfile(subject));
+  Future<void> fetchProfileInfo() async {
+    profile = Profile.fromJson(await dbService.getProfile());
 
     if (profile != null) {
       profile!.email = supabase.auth.currentUser!.email;
@@ -47,8 +54,8 @@ class TrackerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Character>> getCharacters(String subject) async {
-    return dbService.fetchCharacters(subject);
+  Future<List<Character>> getCharacters() async {
+    return dbService.fetchCharacters();
   }
 
   Stream<List<Character>> listenToCharacters(String subject) {
@@ -117,7 +124,7 @@ class TrackerModel extends ChangeNotifier {
   }
 
   void resetActions(String subject, ActionType actionType) async {
-    await dbService.resetActions(subject, actionType.index);
+    await dbService.resetActions(actionType.index);
   }
 
   void deleteTempActions() async {
@@ -204,7 +211,7 @@ class TrackerModel extends ChangeNotifier {
   }
 
   Future<void> saveResetTimes(String? subject) async {
-    if (subject != null) await dbService.updateUserResetTimes(subject);
+    if (subject != null) await dbService.updateUserResetTimes();
   }
 
   void setTabController(TabController tabController) {

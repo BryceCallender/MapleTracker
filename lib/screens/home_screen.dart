@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchSharedPreferenceData();
     final tracker = Provider.of<TrackerModel>(context, listen: false);
     final subject = supabase.auth.currentUser!.id;
-    tracker.fetchUserInfo(subject);
+    tracker.fetchUserInfo();
     _characters = tracker.listenToCharacters(subject);
   }
 
