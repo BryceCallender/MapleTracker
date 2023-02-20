@@ -36,10 +36,12 @@ void main() async {
     registerProtocol('io.mapledailytracker');
   }
 
+  DatabaseService dbService = DatabaseService(supabase);
+
   List<SingleChildWidget> providers = [
     ChangeNotifierProvider<TrackerModel>(
       create: (_) => TrackerModel(
-        dbService: DatabaseService(supabase),
+        dbService: dbService,
       ),
     ),
     ChangeNotifierProvider<AuthenticationService>(
@@ -49,8 +51,14 @@ void main() async {
       create: (context) => supabase.auth.onAuthStateChange,
       initialData: null,
     ),
-    ChangeNotifierProvider<ThemeSettings>(
-      create: (_) => ThemeSettings(),
+    ChangeNotifierProxyProvider<TrackerModel, ThemeSettings>(
+      create: (_) => ThemeSettings(
+        dbService: dbService,
+      ),
+      update: (context, tracker, theme) => ThemeSettings(
+        dbService: dbService,
+        user: tracker.user
+      ),
     )
   ];
 
@@ -137,8 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> getProfile() async {
     try {
-      final userId = supabase.auth.currentUser!.id;
-      context.read<TrackerModel>().fetchProfileInfo(userId);
+      context.read<TrackerModel>().fetchProfileInfo();
     } on PostgrestException catch (error) {
       // context.showErrorSnackBar(message: error.message);
     } catch (error) {

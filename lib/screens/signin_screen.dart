@@ -21,14 +21,9 @@ class SignInScreen extends StatelessWidget {
         SupaEmailAuth(
           authAction: SupaAuthAction.signIn,
           onSuccess: (authResponse) {
-            context.read<TrackerModel>().fetchProfileInfo(authResponse.user!.id);
+            context.read<TrackerModel>().fetchProfileInfo();
           },
         ),
-        // SupaSocialsAuth(
-        //     socialProviders: [SocialProviders.google],
-        //     colored: false,
-        //     onSuccess: (session) {},
-        // ),
         TextButton(
             child: const Text(
               'Forgot Password? Click here',

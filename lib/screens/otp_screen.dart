@@ -48,10 +48,9 @@ class _OtpScreenState extends State<OtpScreen> {
                     otpCode: pin,
                   );
 
-              final userId = supabase.auth.currentUser!.id;
               await Future.wait([
-                context.read<TrackerModel>().fetchProfileInfo(userId),
-                context.read<TrackerModel>().fetchUserInfo(userId)
+                context.read<TrackerModel>().fetchProfileInfo(),
+                context.read<TrackerModel>().fetchUserInfo()
               ]);
             },
           ),

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/material.dart' show Color;
 import 'package:maple_daily_tracker/helpers/reset_helper.dart';
 import 'package:maple_daily_tracker/models/action.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
@@ -9,6 +10,8 @@ class DatabaseService {
   final SupabaseClient client;
 
   DatabaseService(this.client);
+
+  String get uuid => client.auth.currentUser!.id;
 
   Stream<List<dynamic>> listenToCharacters() {
     return client
@@ -22,15 +25,31 @@ class DatabaseService {
         .stream(primaryKey: ['id']).eq("character_id", characterId);
   }
 
-  Future<Map<String, dynamic>> fetchUser(String subject) async {
-    return await client.from("users").select().eq("id", subject).single();
+  Stream<List<dynamic>> listenToUser() {
+    return client.from("users").stream(primaryKey: ['id']).eq('id', uuid);
+  }
+
+  Future<Map<String, dynamic>> fetchUser() async {
+    return await client.from("users").select().eq("id", uuid).single();
   }
 
   Future<Map<String, dynamic>> addCharacter(Character character) async {
-    return await client.from("characters").insert(character.toMap()).select().single();
+    return await client
+        .from("characters")
+        .insert(character.toMap())
+        .select()
+        .single();
   }
 
-  Future<void> updateUserResetTimes(String subject) async {
+  Future<void> updateUserTheme(
+      {required Color primary, required Color secondary}) async {
+    await client
+        .from("users")
+        .update({'primary': primary.value, 'secondary': secondary.value}).match(
+            {'id': uuid});
+  }
+
+  Future<void> updateUserResetTimes() async {
     final dailyReset = ResetHelper.calcResetTime();
     final weeklyBossReset = ResetHelper.calcWeeklyResetTime();
     final weeklyQuestReset =
@@ -46,7 +65,7 @@ class DatabaseService {
       'next_weekly_quest_reset':
           zeroOutTime(DateTime.now().toUtc().add(weeklyQuestReset))
               .toIso8601String()
-    }).match({'id': subject});
+    }).match({'id': uuid});
   }
 
   DateTime zeroOutTime(DateTime reset) {
@@ -111,13 +130,13 @@ class DatabaseService {
     await client.from("actions").delete().in_('id', actionIds);
   }
 
-  Future<void> resetActions(String subject, int actionType) async {
+  Future<void> resetActions(int actionType) async {
     await client.rpc("clear_actions_of_type",
-        params: {'subject': subject, 'action_type_id': actionType});
+        params: {'subject': uuid, 'action_type_id': actionType});
   }
 
-  Future<Map<String, dynamic>> getProfile(String userId) async {
-    return await client.from('profiles').select().eq('id', userId).single()
+  Future<Map<String, dynamic>> getProfile() async {
+    return await client.from('profiles').select().eq('id', uuid).single()
         as Map<String, dynamic>;
   }
 
@@ -143,11 +162,11 @@ class DatabaseService {
         .createSignedUrl(fileName, 60 * 60 * 24 * 365 * 10);
   }
 
-  Future<List<Character>> fetchCharacters(String subject) async {
+  Future<List<Character>> fetchCharacters() async {
     final data = await client
         .from("characters")
         .select('*,actions(*)')
-        .eq("subject_id", subject)
+        .eq("subject_id", uuid)
         .order("order") as List<dynamic>;
 
     return data.map((character) => Character.fromJson(character)).toList();
