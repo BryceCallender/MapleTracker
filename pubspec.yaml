@@ -96,9 +96,11 @@ flutter_icons:
 msix_config:
   display_name: Maple Tracker
   publisher_display_name: Bryce Callender
+  store: false # Set to true to deploy to Microsoft Store
   identity_name: com.brycecallender.mapleDailyTracker
-  msix_version: 1.0.0.0
+  msix_version: 1.0.0.1
   logo_path: assets/logo/logo.png
+  architecture: x64
   capabilities: internetClient
 
 
