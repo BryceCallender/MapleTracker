@@ -48,19 +48,21 @@ class _TimingState extends State<Timing> {
         weeklyQuestReset =
             ResetHelper.calcWeeklyResetTime(resetDay: DateTime.monday);
 
-        if (tracker.user == null)
-          return;
-        
+        if (tracker.user == null) return;
+
         if (dailyReset! < Duration(seconds: 1)) {
-          tracker.resetActions(tracker.user!.userId, ActionType.dailies);
+          tracker.resetActions(tracker.user!.userId, ActionType.dailies,
+              resetTime: dailyReset!);
         }
 
         if (weeklyBossReset! < Duration(seconds: 1)) {
-          tracker.resetActions(tracker.user!.userId, ActionType.weeklyBoss);
+          tracker.resetActions(tracker.user!.userId, ActionType.weeklyBoss,
+              resetTime: weeklyBossReset!);
         }
 
         if (weeklyQuestReset! < Duration(seconds: 1)) {
-          tracker.resetActions(tracker.user!.userId, ActionType.weeklyQuest);
+          tracker.resetActions(tracker.user!.userId, ActionType.weeklyQuest,
+              resetTime: weeklyQuestReset!);
         }
 
         tracker.deleteTempActions();
@@ -77,7 +79,8 @@ class _TimingState extends State<Timing> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: Text(
                 "Timing",
                 style: Theme.of(context).textTheme.subtitle1,
@@ -121,20 +124,27 @@ class _TimingState extends State<Timing> {
     var user = tracker.user;
     var now = DateTime.now().toUtc();
 
+    dailyReset = ResetHelper.calcResetTime();
+    weeklyBossReset = ResetHelper.calcWeeklyResetTime();
+    weeklyQuestReset =
+        ResetHelper.calcWeeklyResetTime(resetDay: DateTime.monday);
+
     if (user == null || resetFromOpen) {
       return;
     }
 
     if (user.nextDailyReset != null && now.isAfter(user.nextDailyReset!)) {
-      tracker.resetActions(user.userId, ActionType.dailies);
+      tracker.resetActions(user.userId, ActionType.dailies, resetTime: dailyReset);
     }
 
-    if (user.nextWeeklyBossReset != null && now.isAfter(user.nextWeeklyBossReset!)) {
-      tracker.resetActions(user.userId, ActionType.weeklyBoss);
+    if (user.nextWeeklyBossReset != null &&
+        now.isAfter(user.nextWeeklyBossReset!)) {
+      tracker.resetActions(user.userId, ActionType.weeklyBoss, resetTime: weeklyBossReset);
     }
 
-    if (user.nextWeeklyQuestReset != null && now.isAfter(user.nextWeeklyQuestReset!)) {
-      tracker.resetActions(user.userId, ActionType.weeklyQuest);
+    if (user.nextWeeklyQuestReset != null &&
+        now.isAfter(user.nextWeeklyQuestReset!)) {
+      tracker.resetActions(user.userId, ActionType.weeklyQuest, resetTime: weeklyQuestReset);
     }
 
     resetFromOpen = true;

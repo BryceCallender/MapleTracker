@@ -8,12 +8,14 @@ import 'package:maple_daily_tracker/models/character.dart';
 import 'package:maple_daily_tracker/models/action.dart' as Maple;
 import 'package:maple_daily_tracker/models/maple-class.dart';
 import 'package:maple_daily_tracker/models/old-maple-tracker.dart' as OMT;
+import 'package:maple_daily_tracker/models/percentage.dart';
 import 'package:maple_daily_tracker/models/profile.dart';
 import 'package:maple_daily_tracker/models/user.dart';
 import 'package:maple_daily_tracker/services/database_service.dart';
 import 'package:collection/collection.dart';
 import 'package:maple_daily_tracker/extensions/character_extensions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
+import 'package:maple_daily_tracker/extensions/datetime_extensions.dart';
 
 class TrackerModel extends ChangeNotifier {
   final List<Character> _characters = [];
@@ -37,7 +39,8 @@ class TrackerModel extends ChangeNotifier {
 
     dbService.listenToUser().listen((event) {
       User streamUser = User.fromJson(event.first);
-      user = user?.copyWith(primary: streamUser.primary, secondary: streamUser.secondary);
+      user = user?.copyWith(
+          primary: streamUser.primary, secondary: streamUser.secondary);
       notifyListeners();
     });
 
@@ -58,6 +61,22 @@ class TrackerModel extends ChangeNotifier {
     return dbService.fetchCharacters();
   }
 
+  Future<void> getPercentages() async {
+    var data = (await dbService.getPercentages())
+        .map((p) => Percentage.fromJson(p))
+        .toList();
+
+    data.forEach((p) {
+      print('${p.id}:${p.type}:${p.percentage}');
+      final existingCharacter = _characters
+          .firstWhereOrNull((element) => element.id == p.id);
+
+      existingCharacter?.sections[p.type]?.completionPercentage = p.percentage.toDouble();
+    });
+
+    notifyListeners();
+  }
+
   Stream<List<Character>> listenToCharacters(String subject) {
     supabase.channel('public:characters').on(
       RealtimeListenTypes.postgresChanges,
@@ -67,8 +86,7 @@ class TrackerModel extends ChangeNotifier {
           table: 'characters',
           filter: 'subject_id=eq.$subject'),
       (payload, [ref]) {
-        int index =
-            characters.indexWhere((c) => c.id == payload['old']['id']);
+        int index = characters.indexWhere((c) => c.id == payload['old']['id']);
         if (index != -1) {
           _characters.removeAt(index);
           if (_tabController.index == index) {
@@ -123,8 +141,24 @@ class TrackerModel extends ChangeNotifier {
     });
   }
 
-  void resetActions(String subject, ActionType actionType) async {
+  void resetActions(String subject, ActionType actionType, {Duration? resetTime}) async {
     await dbService.resetActions(actionType.index);
+
+    if (resetTime != null) {
+      DateTime reset = DateTime.now().add(resetTime).toUtc().zeroOutTime();
+      switch(actionType) {
+        case ActionType.dailies:
+          user = user?.copyWith(nextDailyReset: reset);
+          break;
+        case ActionType.weeklyBoss:
+          user = user?.copyWith(nextWeeklyBossReset: reset);
+          break;
+        case ActionType.weeklyQuest:
+          user = user?.copyWith(nextWeeklyQuestReset: reset);
+          break;
+      }
+      notifyListeners();
+    }
   }
 
   void deleteTempActions() async {

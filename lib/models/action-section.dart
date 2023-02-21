@@ -5,6 +5,7 @@ class ActionSection {
   bool isActive;
   ActionType actionType;
   Map<int, Action> actions;
+  double? completionPercentage;
 
   List<Action> get actionList => actions.values.toList();
 
@@ -23,9 +24,13 @@ class ActionSection {
   }
 
   double percentage() {
+    if (actionList.isEmpty && completionPercentage != null) {
+      return completionPercentage!;
+    }
+
     double done = 0;
 
-    for (var action in actions.values) {
+    for (var action in actionList) {
       if (action.done) {
         done++;
       }

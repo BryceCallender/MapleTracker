@@ -69,12 +69,12 @@ class Character {
     int visibleSections = 0;
 
     for (var section in sections.values) {
-      if (!section.isActive) {
+      if (!section.isActive || (section.actionList.isEmpty && section.completionPercentage == null)) {
         continue;
       }
 
       visibleSections++;
-      if (section.percentage() == 1.0) {
+      if (section.percentage() >= 1.0) {
         completedSections++;
       }
     }
