@@ -67,7 +67,6 @@ class TrackerModel extends ChangeNotifier {
         .toList();
 
     data.forEach((p) {
-      print('${p.id}:${p.type}:${p.percentage}');
       final existingCharacter = _characters
           .firstWhereOrNull((element) => element.id == p.id);
 
