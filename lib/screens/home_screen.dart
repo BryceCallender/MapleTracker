@@ -30,8 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchSharedPreferenceData();
     final tracker = Provider.of<TrackerModel>(context, listen: false);
     final subject = supabase.auth.currentUser!.id;
-    tracker.fetchUserInfo();
-    _characters = tracker.listenToCharacters(subject);
+    fetchCharacterData(tracker, subject);
   }
 
   void fetchSharedPreferenceData() async {
@@ -40,6 +39,12 @@ class _HomeScreenState extends State<HomeScreen> {
       hasOnboarded = prefs.getBool('onboarded') ?? false;
       _isLoading = false;
     });
+  }
+
+  void fetchCharacterData(TrackerModel tracker, String subject) async {
+    _characters = tracker.listenToCharacters(subject);
+    await tracker.fetchUserInfo();
+    await tracker.getPercentages();
   }
 
   @override

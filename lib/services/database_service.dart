@@ -135,6 +135,10 @@ class DatabaseService {
         params: {'subject': uuid, 'action_type_id': actionType});
   }
 
+  Future<List<dynamic>> getPercentages() async {
+    return await client.rpc('calc_percentages', params: {'subject': uuid});
+  }
+
   Future<Map<String, dynamic>> getProfile() async {
     return await client.from('profiles').select().eq('id', uuid).single()
         as Map<String, dynamic>;

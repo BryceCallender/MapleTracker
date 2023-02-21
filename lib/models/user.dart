@@ -37,14 +37,14 @@ class User {
         primary = Color(json['primary']),
         secondary = Color(json['secondary']);
 
-  User copyWith({Color? primary, Color? secondary}) {
+  User copyWith({Color? primary, Color? secondary, DateTime? nextDailyReset, DateTime? nextWeeklyBossReset, DateTime? nextWeeklyQuestReset }) {
     return User(
       userId: userId,
       createdOn: createdOn,
       updatedOn: updatedOn,
-      nextDailyReset: nextDailyReset,
-      nextWeeklyBossReset: nextWeeklyBossReset,
-      nextWeeklyQuestReset: nextWeeklyQuestReset,
+      nextDailyReset: nextDailyReset ?? this.nextDailyReset,
+      nextWeeklyBossReset: nextWeeklyBossReset ?? this.nextWeeklyBossReset,
+      nextWeeklyQuestReset: nextWeeklyQuestReset ?? this.nextWeeklyQuestReset,
       primary: primary ?? this.primary,
       secondary: secondary ?? this.secondary
     );
