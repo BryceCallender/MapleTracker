@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:maple_daily_tracker/constants.dart';
 import 'package:maple_daily_tracker/mappers/mapper.dart';
@@ -251,9 +249,12 @@ class TrackerModel extends ChangeNotifier {
     _tabController = tabController;
   }
 
-  void changeCharacterOrder(
-      int characterId, int otherCharacterId, int oldOrder, int newOrder) async {
-    await dbService.updateCharacterOrder(characterId, otherCharacterId);
+  void changeCharacterOrder(List<Character> characters) async {
+    for (int i = 0; i < characters.length; i++) {
+      _characters[i] = characters[i].copyWith(order: i);
+    }
+
+    await dbService.upsertCharactersOrder(_characters);
   }
 
   void changeTab(int index) {
