@@ -1,4 +1,3 @@
-import 'package:enum_to_string/enum_to_string.dart';
 import 'package:maple_daily_tracker/models/maple-class.dart';
 
 import 'action-section.dart';
@@ -55,6 +54,16 @@ class Character {
         'subject_id': subjectId,
         'hidden_sections': hiddenSections
       };
+
+  Map<String, dynamic> toCompleteMap() => {
+    'id': id,
+    'name': name,
+    'order': order,
+    'class_id': classId == null ? null : classId!.index,
+    'created': createdOn.toIso8601String(),
+    'subject_id': subjectId,
+    'hidden_sections': hiddenSections
+  };
 
   void hideSections() {
     var actionTypes = ActionType.values;

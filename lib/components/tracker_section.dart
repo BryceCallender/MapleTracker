@@ -6,10 +6,8 @@ import 'package:maple_daily_tracker/extensions/snackbar_extensions.dart';
 import 'package:reorderable_tabbar/reorderable_tabbar.dart';
 import 'package:maple_daily_tracker/helpers/image_helper.dart';
 import 'package:maple_daily_tracker/models/character.dart';
-import 'package:maple_daily_tracker/models/old-maple-tracker.dart' as OMT;
 import 'package:maple_daily_tracker/providers/tracker.dart';
 import 'package:provider/provider.dart';
-import 'package:collection/collection.dart';
 
 class TrackerSection extends StatefulWidget {
   const TrackerSection({Key? key, required this.characters}) : super(key: key);
@@ -65,12 +63,10 @@ class _TrackerSectionState extends State<TrackerSection>
                     tabs: _buildTabs(widget.characters),
                     tabBorderRadius: BorderRadius.circular(5.0),
                     onReorder: (oldIndex, newIndex) {
-                      final tabCharacter = characters[oldIndex];
-                      final swappingChar = characters[newIndex];
                       setState(() {
-                        widget.characters.swap(oldIndex, newIndex);
-                        tracker.changeCharacterOrder(tabCharacter.id!,
-                            swappingChar.id!, oldIndex, newIndex);
+                        final character = widget.characters.removeAt(oldIndex);
+                        widget.characters.insert(newIndex, character);
+                        tracker.changeCharacterOrder(widget.characters);
                       });
                     }),
               ),

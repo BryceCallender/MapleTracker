@@ -12,6 +12,7 @@ extension CharacterUtils on Character {
       id: id ?? this.id,
       name: name ?? this.name,
       order: order ?? this.order,
+      classId: this.classId,
       subjectId: subjectId ?? this.subjectId,
       createdOn: this.createdOn,
       hiddenSections: hiddenSections ?? this.hiddenSections,

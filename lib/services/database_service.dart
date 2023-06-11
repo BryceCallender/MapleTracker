@@ -97,6 +97,15 @@ class DatabaseService {
         .select();
   }
 
+  Future<List<dynamic>> upsertCharactersOrder(
+      List<Character> characters) async {
+    return await client
+        .from("characters")
+        .upsert(characters.map((c) => c.toCompleteMap()).toList(),
+            onConflict: 'id')
+        .select();
+  }
+
   Future<void> updateAction(Action action) async {
     await client.from("actions").update({
       'name': action.name,
@@ -104,14 +113,6 @@ class DatabaseService {
       'updated': DateTime.now().toUtc().toIso8601String(),
       'order': action.order
     }).match({'id': action.id});
-  }
-
-  Future<void> updateCharacterOrder(
-      int characterId, int otherCharacterId) async {
-    await client.rpc("swap_order", params: {
-      'character_id': characterId,
-      'other_character_id': otherCharacterId
-    });
   }
 
   Future<void> deleteCharacter(int characterId) async {
